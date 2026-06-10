@@ -8,6 +8,8 @@ import CarritoPage from '@/features/frutero/carrito/CarritoPage'
 import PedidosPage from '@/features/frutero/pedidos/PedidosPage'
 import MiCatalogoPage from '@/features/proveedor/catalogo/MiCatalogoPage'
 import AdminPage from '@/features/admin/AdminPage'
+import RutaPage from '@/features/repartidor/RutaPage'
+import EstadoPage from '@/features/repartidor/EstadoPage'
 import ProtectedRoute from '@/components/ProtectedRoute'
 
 export const router = createBrowserRouter([
@@ -61,12 +63,30 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // ─── Admin (protegida, placeholder) ──────────────────────────────────────
+  // ─── Admin (protegida) ───────────────────────────────────────────────────
   {
     path: '/app/admin',
     element: (
       <ProtectedRoute roles={['admin']}>
         <AdminPage />
+      </ProtectedRoute>
+    ),
+  },
+
+  // ─── Repartidor (protegida) ───────────────────────────────────────────────
+  {
+    path: '/app/repartidor',
+    element: (
+      <ProtectedRoute roles={['repartidor']}>
+        <RutaPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/app/repartidor/estado',
+    element: (
+      <ProtectedRoute roles={['repartidor']}>
+        <EstadoPage />
       </ProtectedRoute>
     ),
   },

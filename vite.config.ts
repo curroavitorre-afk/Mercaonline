@@ -11,8 +11,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'MercaFruit',
-        short_name: 'MercaFruit',
+        name: 'MercaOnline',
+        short_name: 'MercaOnline',
         description: 'Pedidos de fruta del mercado central — un solo envío, varios puestos',
         theme_color: '#16a34a',
         background_color: '#ffffff',

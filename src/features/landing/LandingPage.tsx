@@ -8,7 +8,7 @@ export default function LandingPage() {
       {/* ── HEADER sticky ─────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 flex items-center justify-between px-5 py-4 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
         <span className="font-bold text-white text-lg tracking-tight">
-          🍊 MercaFruit
+          🍊 MercaOnline
         </span>
         <Link
           to="/login"
@@ -252,7 +252,7 @@ export default function LandingPage() {
 
           <p className="text-slate-600 text-lg leading-relaxed mb-10">
             Tus clientes te buscan cada madrugada.
-            Con MercaFruit te encuentran la noche anterior,
+            Con MercaOnline te encuentran la noche anterior,
             sin que muevas un dedo.
           </p>
 
@@ -294,7 +294,7 @@ export default function LandingPage() {
         <div className="max-w-xl mx-auto text-center">
           <p className="text-5xl mb-6">🍊</p>
           <h2 className="text-3xl font-bold mb-3">
-            MercaFruit
+            MercaOnline
           </h2>
           <p className="text-slate-400 mb-10 text-lg">
             La lonja en tu bolsillo.

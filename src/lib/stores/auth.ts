@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>()(
       clearError: () => set({ error: null }),
     }),
     {
-      name: 'mercafruit-auth',
+      name: 'mercaonline-auth',
       // Solo persiste user e isAuthenticated, no el estado de carga
       partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
     },

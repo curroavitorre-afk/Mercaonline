@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { User, Proveedor, Producto, Order, OrderLine, OrderStatus, Role, Unidad } from './types'
+import type { User, Proveedor, Producto, Order, OrderLine, OrderStatus, Role, Unidad, EstadoAprobacion } from './types'
 
 // ─── Row types (espejo del schema SQL) ───────────────────────────────────────
 
@@ -18,6 +18,8 @@ interface ProveedorRow {
   descripcion: string
   imagen_url: string | null
   activo: boolean
+  estado_aprobacion: string
+  aprobado_por: string | null
 }
 
 interface ProductoRow {
@@ -74,6 +76,8 @@ const toProveedor = (r: ProveedorRow): Proveedor => ({
   descripcion: r.descripcion,
   imagenUrl: r.imagen_url ?? undefined,
   activo: r.activo,
+  estadoAprobacion: r.estado_aprobacion as EstadoAprobacion,
+  aprobadoPor: r.aprobado_por ?? undefined,
 })
 
 const toProducto = (r: ProductoRow): Producto => ({
@@ -152,7 +156,11 @@ export async function loginUser(telefono: string): Promise<User> {
 // ─── Proveedores ──────────────────────────────────────────────────────────────
 
 export async function getProveedores(): Promise<Proveedor[]> {
-  const { data, error } = await supabase.from('proveedores').select('*').eq('activo', true)
+  const { data, error } = await supabase
+    .from('proveedores')
+    .select('*')
+    .eq('activo', true)
+    .eq('estado_aprobacion', 'aprobado')
   if (error) throw new Error(error.message)
   return (data as ProveedorRow[]).map(toProveedor)
 }
@@ -303,4 +311,58 @@ export async function getOrderById(id: string): Promise<Order | null> {
 export async function updateOrderStatus(id: string, estado: OrderStatus): Promise<void> {
   const { error } = await supabase.from('orders').update({ estado }).eq('id', id)
   if (error) throw new Error(error.message)
+}
+
+// ─── Admin ────────────────────────────────────────────────────────────────────
+
+export async function getProveedoresPendientes(): Promise<Proveedor[]> {
+  const { data, error } = await supabase
+    .from('proveedores')
+    .select('*')
+    .eq('estado_aprobacion', 'pendiente')
+  if (error) throw new Error(error.message)
+  return (data as ProveedorRow[]).map(toProveedor)
+}
+
+export async function aprobarProveedor(id: string, adminId: string): Promise<void> {
+  const { error } = await supabase
+    .from('proveedores')
+    .update({ estado_aprobacion: 'aprobado', aprobado_por: adminId })
+    .eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function rechazarProveedor(id: string, adminId: string): Promise<void> {
+  const { error } = await supabase
+    .from('proveedores')
+    .update({ estado_aprobacion: 'rechazado', aprobado_por: adminId })
+    .eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function getAllOrdersToday(): Promise<Order[]> {
+  const hoy = new Date()
+  hoy.setHours(0, 0, 0, 0)
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, order_lines(*)')
+    .gte('created_at', hoy.toISOString())
+    .order('created_at', { ascending: false })
+  if (error) throw new Error(error.message)
+  return (data as OrderRow[]).map(toOrder)
+}
+
+// ─── Repartidor ───────────────────────────────────────────────────────────────
+
+export async function getOrdersDelDiaRepartidor(repartidorId: string): Promise<Order[]> {
+  const hoy = new Date()
+  hoy.setHours(0, 0, 0, 0)
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, order_lines(*)')
+    .eq('repartidor_id', repartidorId)
+    .gte('created_at', hoy.toISOString())
+    .order('created_at', { ascending: false })
+  if (error) throw new Error(error.message)
+  return (data as OrderRow[]).map(toOrder)
 }

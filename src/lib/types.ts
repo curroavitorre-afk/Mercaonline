@@ -14,6 +14,8 @@ export interface User {
 
 // ─── Proveedor (puesto en la lonja) ───────────────────────────────────────────
 
+export type EstadoAprobacion = 'pendiente' | 'aprobado' | 'rechazado'
+
 export interface Proveedor {
   id: string
   userId: string // FK → User (el dueño del puesto)
@@ -21,6 +23,8 @@ export interface Proveedor {
   descripcion: string
   imagenUrl?: string
   activo: boolean
+  estadoAprobacion: EstadoAprobacion
+  aprobadoPor?: string // FK → User (role: admin)
 }
 
 // ─── Unidades de medida ───────────────────────────────────────────────────────

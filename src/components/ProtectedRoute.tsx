@@ -21,7 +21,7 @@ export default function ProtectedRoute({ children, roles }: Props) {
     const roleHome: Record<Role, string> = {
       frutero: '/app/frutero',
       proveedor: '/app/proveedor',
-      repartidor: '/app/frutero', // TODO: cuando exista la app del repartidor
+      repartidor: '/app/repartidor',
       admin: '/app/admin',
     }
     return <Navigate to={roleHome[user.role]} replace />
