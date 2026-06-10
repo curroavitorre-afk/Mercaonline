@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '../types'
 import { loginUser, registerUser } from '../api'
+import { supabase } from '../supabase'
 
 interface AuthState {
   user: User | null
@@ -13,6 +14,7 @@ interface AuthState {
   register: (telefono: string, nombre: string, role: User['role']) => Promise<void>
   logout: () => void
   clearError: () => void
+  setUser: (user: User) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -44,15 +46,23 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        supabase.auth.signOut()
         set({ user: null, isAuthenticated: false, error: null })
       },
 
       clearError: () => set({ error: null }),
+
+      setUser: (user) => set({ user, isAuthenticated: true }),
     }),
     {
       name: 'mercaonline-auth',
-      // Solo persiste user e isAuthenticated, no el estado de carga
       partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
     },
   ),
 )
+
+supabase.auth.onAuthStateChange((event) => {
+  if (event === 'SIGNED_OUT') {
+    useAuthStore.setState({ user: null, isAuthenticated: false })
+  }
+})
