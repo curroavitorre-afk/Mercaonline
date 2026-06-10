@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
 import { supabase } from '@/lib/supabase'
 import { loginUser } from '@/lib/api'
+import { MOCK_USERS } from '@/lib/mock-data'
 import type { Role } from '@/lib/types'
 
 const MOCK_PHONES = ['600000001', '600000002']
@@ -10,7 +11,7 @@ const MOCK_PHONES = ['600000001', '600000002']
 const ROLE_HOME: Record<Role, string> = {
   frutero: '/app/frutero',
   proveedor: '/app/proveedor',
-  repartidor: '/app/frutero',
+  repartidor: '/app/repartidor',
   admin: '/app/admin',
 }
 
@@ -27,6 +28,10 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [countdown, setCountdown] = useState(0)
+  const [demoMode, setDemoMode] = useState<'frutero' | 'proveedor' | null>(null)
+  const [showRepartidorAccess, setShowRepartidorAccess] = useState(false)
+  const [repartidorPassword, setRepartidorPassword] = useState('')
+  const [repartidorError, setRepartidorError] = useState<string | null>(null)
 
   const inputRefs = useRef<Array<HTMLInputElement | null>>([])
 
@@ -83,6 +88,15 @@ export default function LoginPage() {
 
     setIsLoading(true)
     try {
+      if (demoMode && token === '123456') {
+        const mockUser = MOCK_USERS.find(u => u.telefono === telefono.trim())
+        if (mockUser) {
+          setUser(mockUser)
+          navigate(from ?? ROLE_HOME[mockUser.role], { replace: true })
+        }
+        return
+      }
+
       const { error: verifyError } = await supabase.auth.verifyOtp({
         phone: `+34${telefono.trim()}`,
         token,
@@ -109,6 +123,11 @@ export default function LoginPage() {
 
   async function handleReenviar() {
     setError(null)
+    if (demoMode) {
+      setCodigos(Array(6).fill(''))
+      setTimeout(() => inputRefs.current[0]?.focus(), 20)
+      return
+    }
     setIsLoading(true)
     try {
       const { error: otpError } = await supabase.auth.signInWithOtp({ phone: `+34${telefono.trim()}` })
@@ -146,6 +165,28 @@ export default function LoginPage() {
     pasted.split('').forEach((d, i) => { next[i] = d })
     setCodigos(next)
     inputRefs.current[Math.min(pasted.length, 5)]?.focus()
+  }
+
+  function handleDemoOtp(phone: string, role: 'frutero' | 'proveedor') {
+    setDemoMode(role)
+    setTelefono(phone)
+    setError(null)
+    setCodigos(Array(6).fill(''))
+    setStep('codigo')
+    setCountdown(30)
+  }
+
+  async function handleRepartidorAccess(e: FormEvent) {
+    e.preventDefault()
+    setRepartidorError(null)
+    if (repartidorPassword !== 'mercaonline2024') {
+      setRepartidorError('Código incorrecto')
+      return
+    }
+    const mockUser = MOCK_USERS.find(u => u.telefono === '600000003')
+    if (!mockUser) return
+    setUser(mockUser)
+    navigate(from ?? ROLE_HOME[mockUser.role], { replace: true })
   }
 
   return (
@@ -218,25 +259,61 @@ export default function LoginPage() {
               </form>
 
               <div className="mt-6 pt-5" style={{ borderTop: '1px solid #E5E7EB' }}>
-                <p className="text-xs text-center mb-3" style={{ color: '#9CA3AF' }}>Usuarios de prueba</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { label: 'Frutero', phone: '600000001' },
-                    { label: 'Proveedor', phone: '600000002' },
-                  ].map(({ label, phone }) => (
+                <p
+                  className="text-xs text-center font-medium tracking-widest mb-4"
+                  style={{ color: '#6B7280', fontFamily: 'Inter, sans-serif' }}
+                >
+                  ACCESO DEMO
+                </p>
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleDemoOtp('600000001', 'frutero')}
+                    className="w-full text-white text-sm transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: '#1B3A2A', borderRadius: 12, padding: '14px', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}
+                  >
+                    Entrar como Frutero
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDemoOtp('600000002', 'proveedor')}
+                    className="w-full text-white text-sm transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: '#6F9E7B', borderRadius: 12, padding: '14px', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}
+                  >
+                    Entrar como Puesto
+                  </button>
+                  {!showRepartidorAccess ? (
                     <button
-                      key={phone}
                       type="button"
-                      onClick={() => setTelefono(phone)}
-                      className="px-3 py-2 text-left transition-colors"
-                      style={{ borderRadius: 10, backgroundColor: '#F8F7F3', border: '1px solid #E5E7EB' }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F0F5F1')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#F8F7F3')}
+                      onClick={() => { setShowRepartidorAccess(true); setRepartidorError(null); setRepartidorPassword('') }}
+                      className="w-full text-sm transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: '#F8F7F3', color: '#1B3A2A', border: '1px solid #1B3A2A', borderRadius: 12, padding: '14px', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}
                     >
-                      <p className="text-xs font-medium" style={{ color: '#222222' }}>{label}</p>
-                      <p className="text-xs font-mono" style={{ color: '#6B7280' }}>{phone}</p>
+                      Acceso Repartidor
                     </button>
-                  ))}
+                  ) : (
+                    <form onSubmit={handleRepartidorAccess} className="flex flex-col gap-2">
+                      <input
+                        type="password"
+                        placeholder="Código de acceso"
+                        value={repartidorPassword}
+                        onChange={(e) => setRepartidorPassword(e.target.value)}
+                        className="w-full px-4 py-3 text-sm outline-none"
+                        style={{ border: '1px solid #E5E7EB', borderRadius: 12, color: '#222222', fontFamily: 'Inter, sans-serif' }}
+                        autoFocus
+                      />
+                      {repartidorError && (
+                        <p className="text-xs px-1" style={{ color: '#DC2626' }}>{repartidorError}</p>
+                      )}
+                      <button
+                        type="submit"
+                        className="w-full text-sm transition-opacity hover:opacity-90"
+                        style={{ backgroundColor: '#F8F7F3', color: '#1B3A2A', border: '1px solid #1B3A2A', borderRadius: 12, padding: '14px', fontFamily: 'Inter, sans-serif', fontWeight: 500 }}
+                      >
+                        Entrar
+                      </button>
+                    </form>
+                  )}
                 </div>
               </div>
             </>
@@ -301,7 +378,7 @@ export default function LoginPage() {
               <div className="mt-4 flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() => { setStep('telefono'); setError(null); setCodigos(Array(6).fill('')) }}
+                  onClick={() => { setStep('telefono'); setError(null); setCodigos(Array(6).fill('')); setDemoMode(null) }}
                   className="text-sm"
                   style={{ color: '#6B7280' }}
                 >
