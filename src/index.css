@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+
+/* Tailwind v4: definir tokens de diseño como custom properties */
+@theme {
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a;
+  --color-brand-700: #15803d;
+
+  --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Base global — mobile-first PWA */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* safe area para notch e isla dinámica en iOS */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
