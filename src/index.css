@@ -1,17 +1,19 @@
 @import 'tailwindcss';
 
-/* Tailwind v4: definir tokens de diseño como custom properties */
 @theme {
-  --color-brand-50: #f0fdf4;
-  --color-brand-100: #dcfce7;
-  --color-brand-500: #22c55e;
-  --color-brand-600: #16a34a;
-  --color-brand-700: #15803d;
+  /* Sistema de color MercaOnline */
+  --color-bosque: #1B3A2A;
+  --color-bosque-dark: #152D20;
+  --color-salvia: #6F9E7B;
+  --color-naranja: #F28C28;
+  --color-naranja-dark: #D97A1E;
+  --color-fondo: #F8F7F3;
 
-  --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* Tipografía */
+  --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
 }
 
-/* Base global — mobile-first PWA */
 html,
 body,
 #root {
@@ -20,9 +22,9 @@ body,
 
 body {
   font-family: var(--font-sans);
+  background-color: #F8F7F3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* safe area para notch e isla dinámica en iOS */
   padding-bottom: env(safe-area-inset-bottom);
 }
 

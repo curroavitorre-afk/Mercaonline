@@ -6,6 +6,7 @@ import RegistroPage from '@/features/auth/RegistroPage'
 import CatalogoPage from '@/features/frutero/catalogo/CatalogoPage'
 import CarritoPage from '@/features/frutero/carrito/CarritoPage'
 import PedidosPage from '@/features/frutero/pedidos/PedidosPage'
+import PerfilPage from '@/features/frutero/perfil/PerfilPage'
 import MiCatalogoPage from '@/features/proveedor/catalogo/MiCatalogoPage'
 import AdminPage from '@/features/admin/AdminPage'
 import RutaPage from '@/features/repartidor/RutaPage'
@@ -49,6 +50,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={['frutero']}>
         <PedidosPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/app/frutero/perfil',
+    element: (
+      <ProtectedRoute roles={['frutero']}>
+        <PerfilPage />
       </ProtectedRoute>
     ),
   },

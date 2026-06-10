@@ -31,6 +31,7 @@ export const MOCK_PROVEEDORES: Proveedor[] = [
     nombre: 'Frutas García',
     descripcion: 'Cítricos y tropicales de temporada',
     activo: true,
+    estadoAprobacion: 'aprobado',
   },
   {
     id: 'p2',
@@ -38,6 +39,7 @@ export const MOCK_PROVEEDORES: Proveedor[] = [
     nombre: 'Verduras Hermanos López',
     descripcion: 'Hortalizas frescas de Almería',
     activo: true,
+    estadoAprobacion: 'aprobado',
   },
   {
     id: 'p3',
@@ -45,6 +47,7 @@ export const MOCK_PROVEEDORES: Proveedor[] = [
     nombre: 'Finca El Olivo',
     descripcion: 'Fruta de hueso y pepita de Granada',
     activo: true,
+    estadoAprobacion: 'aprobado',
   },
 ]
 
