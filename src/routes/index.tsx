@@ -6,8 +6,12 @@ import RegistroPage from '@/features/auth/RegistroPage'
 import CatalogoPage from '@/features/frutero/catalogo/CatalogoPage'
 import CarritoPage from '@/features/frutero/carrito/CarritoPage'
 import PedidosPage from '@/features/frutero/pedidos/PedidosPage'
+import ChatPage from '@/features/frutero/chat/ChatPage'
 import PerfilPage from '@/features/frutero/perfil/PerfilPage'
+import ProveedorDashboardPage from '@/features/proveedor/ProveedorDashboardPage'
 import MiCatalogoPage from '@/features/proveedor/catalogo/MiCatalogoPage'
+import PedidosProveedorPage from '@/features/proveedor/pedidos/PedidosProveedorPage'
+import PerfilProveedorPage from '@/features/proveedor/perfil/PerfilProveedorPage'
 import AdminPage from '@/features/admin/AdminPage'
 import RutaPage from '@/features/repartidor/RutaPage'
 import EstadoPage from '@/features/repartidor/EstadoPage'
@@ -54,6 +58,14 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: '/app/frutero/chat',
+    element: (
+      <ProtectedRoute roles={['frutero']}>
+        <ChatPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/app/frutero/perfil',
     element: (
       <ProtectedRoute roles={['frutero']}>
@@ -67,7 +79,31 @@ export const router = createBrowserRouter([
     path: '/app/proveedor',
     element: (
       <ProtectedRoute roles={['proveedor']}>
+        <ProveedorDashboardPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/app/proveedor/catalogo',
+    element: (
+      <ProtectedRoute roles={['proveedor']}>
         <MiCatalogoPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/app/proveedor/pedidos',
+    element: (
+      <ProtectedRoute roles={['proveedor']}>
+        <PedidosProveedorPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/app/proveedor/perfil',
+    element: (
+      <ProtectedRoute roles={['proveedor']}>
+        <PerfilProveedorPage />
       </ProtectedRoute>
     ),
   },

@@ -163,7 +163,7 @@ export default function PedidosPage() {
   const hayPedidos = MOCK_ORDERS.length > 0
 
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: '#F8F7F3' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
       {/* Cabecera */}
       <div className="bg-white px-4 pt-4 pb-4" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
         <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Mis pedidos</h1>

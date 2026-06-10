@@ -18,7 +18,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Cítricos y fruta de temporada',
     pabellon: 'A',
     numPuesto: '12',
-    foto: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400',
+    foto: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=90&fit=crop',
     disponibilidad: 'mañana',
   },
   {
@@ -27,7 +27,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Verdura de hoja y tomate',
     pabellon: 'B',
     numPuesto: '7',
-    foto: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400',
+    foto: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&q=90&fit=crop',
     disponibilidad: 'mañana',
   },
   {
@@ -36,7 +36,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Melocotón, cereza y fruta de hueso',
     pabellon: 'A',
     numPuesto: '3',
-    foto: 'https://images.unsplash.com/photo-1528821128474-27f963b062bf?w=400',
+    foto: 'https://images.unsplash.com/photo-1528821128474-27f963b062bf?w=800&q=90&fit=crop',
     disponibilidad: 'pocas',
   },
   {
@@ -45,7 +45,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Plátano de Canarias y fruta tropical',
     pabellon: 'C',
     numPuesto: '15',
-    foto: 'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=400',
+    foto: 'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=800&q=90&fit=crop',
     disponibilidad: 'mañana',
   },
   {
@@ -54,7 +54,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Producto local: pimiento, pepino, calabacín',
     pabellon: 'B',
     numPuesto: '2',
-    foto: 'https://images.unsplash.com/photo-1506484381205-f7945653044d?w=400',
+    foto: 'https://images.unsplash.com/photo-1518977676405-d4b5e4c55f8e?w=800&q=90&fit=crop',
     disponibilidad: 'pocas',
   },
   {
@@ -63,7 +63,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Granada, higo y fruta autóctona',
     pabellon: 'D',
     numPuesto: '9',
-    foto: 'https://images.unsplash.com/photo-1601379327928-bedfaf9da2d0?w=400',
+    foto: 'https://images.unsplash.com/photo-1601379327928-bedfaf9da2d0?w=800&q=90&fit=crop',
     disponibilidad: 'mañana',
   },
 ]
@@ -99,7 +99,7 @@ export default function CatalogoPage() {
   )
 
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: '#F8F7F3' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
       {/* Cabecera */}
       <div className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
         <h1 className="text-xl font-bold mb-3 font-serif" style={{ color: '#222222' }}>
