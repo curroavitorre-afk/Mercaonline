@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Producto, Proveedor, OrderLine, SubtotalPorProveedor } from '../types'
 
-const TARIFA_SERVICIO = 5 // euros fijos por pedido — TODO: lógica real (% o tramos)
+const TARIFA_SERVICIO = 4.99 // euros fijos por pedido — TODO: lógica real (% o tramos)
 
 interface CartLine {
   producto: Producto
