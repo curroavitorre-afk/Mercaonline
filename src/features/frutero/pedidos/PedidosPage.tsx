@@ -4,7 +4,6 @@ import { MOCK_ORDERS, MOCK_PRODUCTOS, MOCK_PROVEEDORES } from '@/lib/mock-data'
 import { useCartStore } from '@/lib/stores/cart'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
-import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 import type { Order, OrderStatus } from '@/lib/types'
 
 // ─── Timeline ─────────────────────────────────────────────────────────────────
@@ -218,7 +217,6 @@ function ModalConflicto({ onSustituir, onAnadir, onCancelar }: ModalConflictoPro
 export default function PedidosPage() {
   const navigate = useNavigate()
   const { lineas, addLine, clear } = useCartStore()
-  const bottomNavHeight = useBottomNavHeight()
 
   const [pedidoConflicto, setPedidoConflicto] = useState<Order | null>(null)
   const [toastVisible, setToastVisible] = useState(false)
@@ -269,7 +267,7 @@ export default function PedidosPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
       {/* Toast */}
       {toastVisible && (
         <div
@@ -290,6 +288,13 @@ export default function PedidosPage() {
       <div className="bg-white px-4 pt-4 pb-4" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
         <div className="flex items-center justify-between">
           <div>
+            <button
+              onClick={() => navigate('/app/frutero')}
+              className="text-[11px] font-semibold block mb-0.5"
+              style={{ color: '#1B3A2A', fontFamily: 'Fraunces, serif' }}
+            >
+              MercaOnline
+            </button>
             <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Mis pedidos</h1>
             <p className="text-sm mt-0.5" style={{ color: '#6B7280' }}>
               Historial y seguimiento en tiempo real

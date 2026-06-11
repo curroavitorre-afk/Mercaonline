@@ -1,9 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
 import { MOCK_PROVEEDORES, MOCK_PRODUCTOS } from '@/lib/mock-data'
 import type { Producto } from '@/lib/types'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
-import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 
 function IconPlus() {
   return (
@@ -103,9 +103,17 @@ function ProductoCard({ producto, onToggle }: ProductoCardProps) {
   )
 }
 
+function IconBack() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15,18 9,12 15,6" />
+    </svg>
+  )
+}
+
 export default function MiCatalogoPage() {
+  const navigate = useNavigate()
   const { user } = useAuthStore()
-  const bottomNavHeight = useBottomNavHeight()
   const miProveedor = MOCK_PROVEEDORES.find((p) => p.userId === user?.id) ?? MOCK_PROVEEDORES[0]
 
   const [productos, setProductos] = useState<Producto[]>(
@@ -131,9 +139,25 @@ export default function MiCatalogoPage() {
   const hayProductos = productos.length > 0
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
       {/* Cabecera */}
       <div className="px-4 pt-4 pb-5" style={{ backgroundColor: '#1B3A2A' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-8 h-8 shrink-0"
+            style={{ color: '#FFFFFF', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 8 }}
+          >
+            <IconBack />
+          </button>
+          <button
+            onClick={() => navigate('/app/proveedor')}
+            className="text-[11px] font-bold"
+            style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}
+          >
+            MercaOnline
+          </button>
+        </div>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold font-serif text-white">{miProveedor.nombre}</h1>

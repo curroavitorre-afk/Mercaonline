@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
 import { getOrdersDelDiaRepartidor, updateOrderStatus } from '@/lib/api'
 import type { Order, OrderStatus } from '@/lib/types'
 import BottomNavRepartidor from '@/components/BottomNavRepartidor'
-import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 import { IS_UUID, MOCK_ORDERS_HOY, ENTREGA_INFO } from './mockData'
 
 const PASOS: OrderStatus[] = ['confirmado', 'en_recogida', 'recogido', 'en_reparto', 'entregado']
@@ -97,9 +97,17 @@ function Stepper({ estado }: StepperProps) {
   )
 }
 
+function IconBack() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15,18 9,12 15,6" />
+    </svg>
+  )
+}
+
 export default function EstadoPage() {
+  const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
-  const bottomNavHeight = useBottomNavHeight()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState<string | null>(null)
@@ -135,7 +143,7 @@ export default function EstadoPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
+      <main className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
         <div className="px-5 pt-12 pb-6" style={{ backgroundColor: '#1B3A2A' }}>
           <div className="h-7 w-48 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
         </div>
@@ -148,9 +156,25 @@ export default function EstadoPage() {
   }
 
   return (
-    <main className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
+    <main className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
       {/* Header */}
       <header className="px-5 pt-12 pb-6" style={{ backgroundColor: '#1B3A2A' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-8 h-8 shrink-0"
+            style={{ color: '#FFFFFF', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 8 }}
+          >
+            <IconBack />
+          </button>
+          <button
+            onClick={() => navigate('/app/repartidor')}
+            className="text-[11px] font-bold"
+            style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}
+          >
+            MercaOnline
+          </button>
+        </div>
         <h1
           className="text-2xl font-bold text-white leading-tight"
           style={{ fontFamily: 'Fraunces, serif' }}

@@ -4,7 +4,6 @@ import { useCartStore } from '@/lib/stores/cart'
 import { useAuthStore } from '@/lib/stores/auth'
 import { createOrder } from '@/lib/api'
 import { sendOrderConfirmation } from '@/lib/notifications'
-import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 import type { SubtotalPorProveedor } from '@/lib/types'
 import BottomNav from '@/components/BottomNav'
 
@@ -149,7 +148,7 @@ function PantallaConfirmacion({ grupos, tarifa, total }: ConfirmacionProps) {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen pb-20 flex flex-col" style={{ backgroundColor: '#F8F7F3' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F8F7F3' }}>
       <div className="px-4 pt-12 pb-8 text-center" style={{ backgroundColor: '#1B3A2A' }}>
         <div
           className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -231,7 +230,6 @@ export default function CarritoPage() {
   const navigate = useNavigate()
   const { lineas, updateCantidad, removeLine, getSubtotalPorProveedor, getSubtotalBruto, getTarifaServicio, getTotal, clear } = useCartStore()
   const { user } = useAuthStore()
-  const bottomNavHeight = useBottomNavHeight()
 
   const [modalVisible, setModalVisible] = useState(false)
   const [confirmado, setConfirmado] = useState(false)
@@ -271,7 +269,7 @@ export default function CarritoPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
       {/* Cabecera */}
       <div className="bg-white px-4 pt-4 pb-4" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
         <div className="flex items-center gap-3">
@@ -286,7 +284,7 @@ export default function CarritoPage() {
             <button
               onClick={() => navigate('/app/frutero')}
               className="text-[11px] font-semibold block"
-              style={{ color: '#1B3A2A' }}
+              style={{ color: '#1B3A2A', fontFamily: 'Fraunces, serif' }}
             >
               MercaOnline
             </button>

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
-import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 import { useAuthStore } from '@/lib/stores/auth'
 
 interface Puesto {
@@ -104,7 +103,6 @@ function IconLocation() {
 export default function CatalogoPage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
-  const bottomNavHeight = useBottomNavHeight()
   const [busqueda, setBusqueda] = useState('')
   const [filtroActivo, setFiltroActivo] = useState('Todos')
 
@@ -115,9 +113,16 @@ export default function CatalogoPage() {
   )
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
       {/* Saludo */}
       <div className="px-4 pt-5 pb-5" style={{ backgroundColor: '#1B3A2A' }}>
+        <button
+          onClick={() => navigate('/app/frutero')}
+          className="text-[11px] font-bold block mb-3"
+          style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}
+        >
+          MercaOnline
+        </button>
         <h1 className="text-2xl font-bold text-white font-serif mb-1">
           Buenos días, {user?.nombre ?? 'frutero'}
         </h1>

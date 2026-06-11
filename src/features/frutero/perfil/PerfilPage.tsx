@@ -2,7 +2,6 @@ import { useAuthStore } from '@/lib/stores/auth'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
 import { useNavigate } from 'react-router-dom'
-import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 
 function IconPhone() {
   return (
@@ -80,7 +79,6 @@ function InfoCard({ icon, label, value }: InfoCardProps) {
 export default function PerfilPage() {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
-  const bottomNavHeight = useBottomNavHeight()
 
   function handleLogout() {
     logout()
@@ -95,12 +93,19 @@ export default function PerfilPage() {
     .toUpperCase() ?? 'MO'
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
       {/* Cabecera con fondo verde bosque */}
       <div
         className="px-4 pt-12 pb-8 text-white relative"
         style={{ backgroundColor: '#1B3A2A' }}
       >
+        <button
+          onClick={() => navigate('/app/frutero')}
+          className="text-[11px] font-bold block mb-4"
+          style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}
+        >
+          MercaOnline
+        </button>
         <div className="absolute top-4 right-4">
           <CartIcon iconColor="white" />
         </div>

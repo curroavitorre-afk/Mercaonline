@@ -204,7 +204,7 @@ export default function ProductosPuestoPage() {
             <button
               onClick={() => navigate('/app/frutero')}
               className="text-[11px] font-semibold block"
-              style={{ color: '#1B3A2A' }}
+              style={{ color: '#1B3A2A', fontFamily: 'Fraunces, serif' }}
             >
               MercaOnline
             </button>

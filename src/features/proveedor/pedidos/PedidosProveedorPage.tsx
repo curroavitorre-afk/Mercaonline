@@ -1,7 +1,7 @@
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
 import { MOCK_PROVEEDORES } from '@/lib/mock-data'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
-import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 
 type EstadoPedidoProveedor = 'pendiente' | 'confirmado' | 'recogido'
 
@@ -56,6 +56,14 @@ const ESTADO_CONFIG: Record<EstadoPedidoProveedor, { label: string; bg: string; 
   recogido: { label: 'Recogido', bg: '#EEF2FF', color: '#4338CA' },
 }
 
+function IconBack() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15,18 9,12 15,6" />
+    </svg>
+  )
+}
+
 function IconBox() {
   return (
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -74,8 +82,8 @@ function IconClock() {
 }
 
 export default function PedidosProveedorPage() {
+  const navigate = useNavigate()
   const { user } = useAuthStore()
-  const bottomNavHeight = useBottomNavHeight()
   const miProveedor = MOCK_PROVEEDORES.find((p) => p.userId === user?.id) ?? MOCK_PROVEEDORES[0]
 
   if (!miProveedor) {
@@ -87,9 +95,25 @@ export default function PedidosProveedorPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
       {/* Cabecera */}
       <div className="bg-white px-4 pt-4 pb-4" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
+        <div className="flex items-center gap-2 mb-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-8 h-8 shrink-0"
+            style={{ color: '#222222', backgroundColor: '#F0F5F1', borderRadius: 8 }}
+          >
+            <IconBack />
+          </button>
+          <button
+            onClick={() => navigate('/app/proveedor')}
+            className="text-[11px] font-semibold"
+            style={{ color: '#1B3A2A', fontFamily: 'Fraunces, serif' }}
+          >
+            MercaOnline
+          </button>
+        </div>
         <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Pedidos recibidos</h1>
         <p className="text-sm mt-0.5" style={{ color: '#6B7280' }}>
           {miProveedor.nombre} · entrega mañana

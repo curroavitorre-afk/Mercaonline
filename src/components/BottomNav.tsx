@@ -47,35 +47,38 @@ export default function BottomNav() {
   const { pathname } = useLocation()
 
   return (
-    <nav
-      className="fixed bottom-0 inset-x-0 z-50 bg-white"
-      style={{
-        boxShadow: '0 -1px 0 rgba(0,0,0,0.06), 0 -4px 16px rgba(0,0,0,0.05)',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-      }}
-    >
-      <div className="flex items-stretch">
-        {TABS.map(({ to, label, Icon, exact }) => {
-          const isActive = exact ? pathname === to : pathname.startsWith(to)
-          return (
-            <NavLink key={to} to={to} className="flex-1 block">
-              <div
-                className="flex flex-col items-center justify-center gap-0.5 py-2.5 relative"
-                style={{ color: isActive ? '#1B3A2A' : '#9CA3AF' }}
-              >
-                <Icon />
-                <span className="text-[10px] font-medium tracking-tight">{label}</span>
-                {isActive && (
-                  <span
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full"
-                    style={{ backgroundColor: '#F28C28' }}
-                  />
-                )}
-              </div>
-            </NavLink>
-          )
-        })}
-      </div>
-    </nav>
+    <>
+      <div style={{ height: '80px' }} />
+      <nav
+        className="fixed bottom-0 inset-x-0 z-50 bg-white"
+        style={{
+          boxShadow: '0 -1px 0 rgba(0,0,0,0.06), 0 -4px 16px rgba(0,0,0,0.05)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
+      >
+        <div className="flex items-stretch">
+          {TABS.map(({ to, label, Icon, exact }) => {
+            const isActive = exact ? pathname === to : pathname.startsWith(to)
+            return (
+              <NavLink key={to} to={to} className="flex-1 block">
+                <div
+                  className="flex flex-col items-center justify-center gap-0.5 py-2.5 relative"
+                  style={{ color: isActive ? '#1B3A2A' : '#9CA3AF' }}
+                >
+                  <Icon />
+                  <span className="text-[10px] font-medium tracking-tight">{label}</span>
+                  {isActive && (
+                    <span
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full"
+                      style={{ backgroundColor: '#F28C28' }}
+                    />
+                  )}
+                </div>
+              </NavLink>
+            )
+          })}
+        </div>
+      </nav>
+    </>
   )
 }
