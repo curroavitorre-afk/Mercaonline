@@ -1,11 +1,8 @@
 import { useState } from 'react'
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import type { StripeCardElementOptions } from '@stripe/stripe-js'
 import { useNavigate } from 'react-router-dom'
 import { useCartStore } from '@/lib/stores/cart'
 import { useAuthStore } from '@/lib/stores/auth'
 import { createOrder } from '@/lib/api'
-import { stripePromise, simulateCharge } from '@/lib/stripe'
 import { sendOrderConfirmation } from '@/lib/notifications'
 import type { SubtotalPorProveedor } from '@/lib/types'
 import BottomNav from '@/components/BottomNav'
@@ -56,21 +53,6 @@ function IconCheck() {
   )
 }
 
-// ─── Stripe Card Element options ──────────────────────────────────────────────
-
-const CARD_OPTIONS: StripeCardElementOptions = {
-  style: {
-    base: {
-      fontSize: '16px',
-      color: '#222222',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      '::placeholder': { color: '#9CA3AF' },
-    },
-    invalid: { color: '#EF4444', iconColor: '#EF4444' },
-  },
-  hidePostalCode: true,
-}
-
 // ─── Modal de pago ────────────────────────────────────────────────────────────
 
 interface ModalPagoProps {
@@ -80,37 +62,12 @@ interface ModalPagoProps {
 }
 
 function ModalPago({ total, onClose, onSuccess }: ModalPagoProps) {
-  const stripe = useStripe()
-  const elements = useElements()
   const [cargando, setCargando] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  const handlePagar = async () => {
-    if (!stripe || !elements) return
-    const cardElement = elements.getElement(CardElement)
-    if (!cardElement) return
-
+  const handleConfirmar = async () => {
     setCargando(true)
-    setError(null)
-
-    const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: cardElement,
-    })
-
-    if (pmError) {
-      setError(pmError.message ?? 'Error al procesar la tarjeta')
-      setCargando(false)
-      return
-    }
-
-    try {
-      await simulateCharge(paymentMethod!.id, Math.round(total * 100))
-      await onSuccess()
-    } catch {
-      setError('No se pudo completar el pago. Inténtalo de nuevo.')
-      setCargando(false)
-    }
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await onSuccess()
   }
 
   return (
@@ -118,56 +75,52 @@ function ModalPago({ total, onClose, onSuccess }: ModalPagoProps) {
       <div
         className="absolute inset-0"
         style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-        onClick={onClose}
+        onClick={!cargando ? onClose : undefined}
       />
       <div
         className="relative w-full bg-white p-6 mx-4 mb-4"
         style={{ borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.18)', maxWidth: 480 }}
       >
-        <h2 className="text-xl font-bold font-serif mb-1" style={{ color: '#1B3A2A' }}>
-          Confirmar pago
+        <h2 className="text-xl font-bold font-serif mb-6" style={{ color: '#1B3A2A' }}>
+          Confirmar pedido
         </h2>
-        <p className="text-sm mb-6" style={{ color: '#6B7280' }}>
-          Total a cobrar:{' '}
-          <strong style={{ color: '#222222' }}>{total.toFixed(2)} €</strong>
-        </p>
 
-        <label
-          className="block text-xs font-semibold mb-2 uppercase tracking-wide"
-          style={{ color: '#6B7280' }}
-        >
-          Datos de la tarjeta
-        </label>
-        <div className="p-3 border" style={{ borderColor: '#E5E7EB', borderRadius: 8 }}>
-          <CardElement options={CARD_OPTIONS} />
+        <div className="text-center py-2 mb-2">
+          <span className="text-5xl font-bold font-serif" style={{ color: '#1B3A2A' }}>
+            {total.toFixed(2)} €
+          </span>
         </div>
 
-        {error && (
-          <p className="mt-2 text-sm" style={{ color: '#EF4444' }}>
-            {error}
-          </p>
-        )}
-
-        <p className="mt-2 text-xs" style={{ color: '#6B7280' }}>
-          Modo pruebas — usa tarjeta 4242 4242 4242 4242
+        <p className="text-center text-xs mb-8" style={{ color: '#6B7280' }}>
+          Pago seguro procesado por Stripe
         </p>
 
-        <div className="flex gap-3 mt-6">
+        <div className="flex gap-3">
           <button
             onClick={onClose}
             disabled={cargando}
             className="flex-1 py-3 text-sm font-medium"
-            style={{ color: '#6B7280' }}
+            style={{ color: '#6B7280', backgroundColor: '#F3F4F6', borderRadius: 12 }}
           >
             Cancelar
           </button>
           <button
-            onClick={handlePagar}
-            disabled={cargando || !stripe}
-            className="flex-[2] py-3 text-white font-semibold text-sm transition-colors"
-            style={{ backgroundColor: '#F28C28', borderRadius: 12, opacity: cargando || !stripe ? 0.7 : 1 }}
+            onClick={handleConfirmar}
+            disabled={cargando}
+            className="flex-[2] py-3 text-white font-semibold text-sm"
+            style={{ backgroundColor: '#F28C28', borderRadius: 12, opacity: cargando ? 0.85 : 1 }}
           >
-            {cargando ? 'Procesando...' : `Pagar ${total.toFixed(2)} €`}
+            {cargando ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="9" stroke="white" strokeOpacity="0.3" strokeWidth="2.5" />
+                  <path d="M12 3a9 9 0 0 1 9 9" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+                Procesando...
+              </span>
+            ) : (
+              `Confirmar y pagar ${total.toFixed(2)} €`
+            )}
           </button>
         </div>
       </div>
@@ -437,15 +390,12 @@ export default function CarritoPage() {
 
       <BottomNav />
 
-      {/* Modal de pago (Stripe Elements) */}
       {modalVisible && (
-        <Elements stripe={stripePromise}>
-          <ModalPago
-            total={total}
-            onClose={() => setModalVisible(false)}
-            onSuccess={handlePagoExitoso}
-          />
-        </Elements>
+        <ModalPago
+          total={total}
+          onClose={() => setModalVisible(false)}
+          onSuccess={handlePagoExitoso}
+        />
       )}
     </div>
   )

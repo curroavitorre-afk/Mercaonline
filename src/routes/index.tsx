@@ -4,6 +4,7 @@ import LandingPage from '@/features/landing/LandingPage'
 import LoginPage from '@/features/auth/LoginPage'
 import RegistroPage from '@/features/auth/RegistroPage'
 import CatalogoPage from '@/features/frutero/catalogo/CatalogoPage'
+import ProductosPuestoPage from '@/features/frutero/catalogo/ProductosPuestoPage'
 import CarritoPage from '@/features/frutero/carrito/CarritoPage'
 import PedidosPage from '@/features/frutero/pedidos/PedidosPage'
 import ChatPage from '@/features/frutero/chat/ChatPage'
@@ -38,6 +39,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={['frutero']}>
         <CatalogoPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/app/frutero/catalogo/:proveedorId',
+    element: (
+      <ProtectedRoute roles={['frutero']}>
+        <ProductosPuestoPage />
       </ProtectedRoute>
     ),
   },

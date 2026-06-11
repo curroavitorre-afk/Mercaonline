@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/lib/stores/auth'
 import BottomNav from '@/components/BottomNav'
+import CartIcon from '@/components/CartIcon'
 import { useNavigate } from 'react-router-dom'
 
 function IconPhone() {
@@ -98,6 +99,9 @@ export default function PerfilPage() {
         className="px-4 pt-12 pb-8 text-white relative"
         style={{ backgroundColor: '#1B3A2A' }}
       >
+        <div className="absolute top-4 right-4">
+          <CartIcon iconColor="white" />
+        </div>
         <div className="flex flex-col items-center text-center">
           {/* Avatar con iniciales */}
           <div

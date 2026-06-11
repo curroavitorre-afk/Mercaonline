@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import BottomNav from '@/components/BottomNav'
+import CartIcon from '@/components/CartIcon'
 
 interface Puesto {
   id: number
@@ -89,6 +91,7 @@ function IconLocation() {
 }
 
 export default function CatalogoPage() {
+  const navigate = useNavigate()
   const [busqueda, setBusqueda] = useState('')
   const [filtroActivo, setFiltroActivo] = useState('Todos')
 
@@ -102,9 +105,12 @@ export default function CatalogoPage() {
     <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
       {/* Cabecera */}
       <div className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
-        <h1 className="text-xl font-bold mb-3 font-serif" style={{ color: '#222222' }}>
-          Puestos del mercado
-        </h1>
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>
+            Puestos del mercado
+          </h1>
+          <CartIcon />
+        </div>
 
         {/* Buscador */}
         <div
@@ -197,6 +203,7 @@ export default function CatalogoPage() {
                   <span className="text-xs">Pabellón {puesto.pabellon} · Puesto {puesto.numPuesto}</span>
                 </div>
                 <button
+                  onClick={() => navigate(`/app/frutero/catalogo/${puesto.id}`)}
                   className="text-xs font-semibold px-4 py-2 text-white transition-colors"
                   style={{ backgroundColor: '#1B3A2A', borderRadius: 10 }}
                 >

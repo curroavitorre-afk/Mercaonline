@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { MOCK_ORDERS, MOCK_PRODUCTOS, MOCK_PROVEEDORES } from '@/lib/mock-data'
 import { useCartStore } from '@/lib/stores/cart'
 import BottomNav from '@/components/BottomNav'
+import CartIcon from '@/components/CartIcon'
 import type { Order, OrderStatus } from '@/lib/types'
 
 // ─── Timeline ─────────────────────────────────────────────────────────────────
@@ -285,10 +286,15 @@ export default function PedidosPage() {
 
       {/* Cabecera */}
       <div className="bg-white px-4 pt-4 pb-4" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
-        <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Mis pedidos</h1>
-        <p className="text-sm mt-0.5" style={{ color: '#6B7280' }}>
-          Historial y seguimiento en tiempo real
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Mis pedidos</h1>
+            <p className="text-sm mt-0.5" style={{ color: '#6B7280' }}>
+              Historial y seguimiento en tiempo real
+            </p>
+          </div>
+          <CartIcon />
+        </div>
       </div>
 
       {hayPedidos ? (
