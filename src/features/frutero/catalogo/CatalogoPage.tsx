@@ -21,7 +21,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Frutas y verduras variadas, cítricos y tropicales',
     pabellon: '',
     numPuesto: '117 · 137',
-    foto: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab12?w=800&q=90&fit=crop',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_macias_vera.jpg',
     disponibilidad: 'mañana',
   },
   {
@@ -30,7 +30,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Fruta de temporada nacional',
     pabellon: '',
     numPuesto: '113 · 114 · 115 · 116',
-    foto: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&q=90&fit=crop',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_martin_mariscal.jpg',
     disponibilidad: 'mañana',
   },
   {
@@ -39,7 +39,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Verdura de hoja y hortalizas',
     pabellon: '',
     numPuesto: '111 · 131 · 132 · 133',
-    foto: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&q=90&fit=crop',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/gallegos_e_hijos.jpg',
     disponibilidad: 'mañana',
   },
   {
@@ -48,7 +48,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Patata, cebolla y tubérculos',
     pabellon: '',
     numPuesto: '105 · 106 · 107',
-    foto: 'https://images.unsplash.com/photo-1518977676405-d4b5e4c55f8e?w=800&q=90&fit=crop',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/importpatata.jpg',
     disponibilidad: 'mañana',
   },
   {
@@ -57,7 +57,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Plátano de Canarias y fruta tropical importada',
     pabellon: '',
     numPuesto: '139',
-    foto: 'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=800&q=90&fit=crop',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_del_pino.jpg',
     disponibilidad: 'pocas',
   },
   {
@@ -66,7 +66,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Producto local Granada — verdura de la Vega',
     pabellon: '',
     numPuesto: '101 · 120 · 228-230',
-    foto: 'https://images.unsplash.com/photo-1506484381205-f7945653044d?w=800&q=90&fit=crop',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/hortifrut_granada.jpg',
     disponibilidad: 'mañana',
   },
 ]
@@ -117,11 +117,11 @@ export default function CatalogoPage() {
       {/* Saludo */}
       <div className="px-4 pt-5 pb-5" style={{ backgroundColor: '#1B3A2A' }}>
         <button
-          onClick={() => navigate('/app/frutero')}
-          className="text-[11px] font-bold block mb-3"
-          style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}
+          onClick={() => navigate('/')}
+          className="block mb-3 text-left"
         >
-          MercaOnline
+          <span className="text-[11px] font-bold" style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}>MercaOnline</span>
+          <span className="text-[9px] block mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Inicio</span>
         </button>
         <h1 className="text-2xl font-bold text-white font-serif mb-1">
           Buenos días, {user?.nombre ?? 'frutero'}

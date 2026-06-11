@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
 import { MOCK_PROVEEDORES, MOCK_PRODUCTOS } from '@/lib/mock-data'
-import type { Producto } from '@/lib/types'
+import type { Producto, Unidad } from '@/lib/types'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
 
 function IconPlus() {
   return (
@@ -52,12 +54,45 @@ function IconX() {
   )
 }
 
+function IconBack() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15,18 9,12 15,6" />
+    </svg>
+  )
+}
+
+function IconEdit() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+  )
+}
+
+function IconTrash() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3,6 5,6 21,6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </svg>
+  )
+}
+
+// ─── ProductoCard ─────────────────────────────────────────────────────────────
+
 interface ProductoCardProps {
   producto: Producto
   onToggle: (id: string) => void
+  onEdit: (producto: Producto) => void
+  onDelete: (id: string) => void
 }
 
-function ProductoCard({ producto, onToggle }: ProductoCardProps) {
+function ProductoCard({ producto, onToggle, onEdit, onDelete }: ProductoCardProps) {
   return (
     <div
       className="bg-white px-4 py-4"
@@ -73,6 +108,11 @@ function ProductoCard({ producto, onToggle }: ProductoCardProps) {
           <p className="font-semibold text-sm" style={{ color: '#222222' }}>
             {producto.nombre}
           </p>
+          {producto.descripcion && (
+            <p className="text-xs mt-0.5 truncate" style={{ color: '#9CA3AF' }}>
+              {producto.descripcion}
+            </p>
+          )}
           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
             <span
               className="text-xs font-semibold px-2 py-0.5"
@@ -86,30 +126,63 @@ function ProductoCard({ producto, onToggle }: ProductoCardProps) {
           </div>
         </div>
 
-        {/* Toggle activo/inactivo */}
-        <button
-          onClick={() => onToggle(producto.id)}
-          className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors"
-          style={{ backgroundColor: producto.activo ? '#1B3A2A' : '#D1D5DB' }}
-          aria-label={producto.activo ? 'Desactivar' : 'Activar'}
-        >
-          <span
-            className="inline-block h-4 w-4 rounded-full bg-white transition-transform"
-            style={{ transform: producto.activo ? 'translateX(24px)' : 'translateX(4px)' }}
-          />
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => onEdit(producto)}
+            className="w-8 h-8 flex items-center justify-center"
+            style={{ backgroundColor: '#F0F5F1', color: '#1B3A2A', borderRadius: 8 }}
+            aria-label="Editar producto"
+          >
+            <IconEdit />
+          </button>
+          <button
+            onClick={() => onDelete(producto.id)}
+            className="w-8 h-8 flex items-center justify-center"
+            style={{ backgroundColor: '#FEF2F2', color: '#DC2626', borderRadius: 8 }}
+            aria-label="Eliminar producto"
+          >
+            <IconTrash />
+          </button>
+          <button
+            onClick={() => onToggle(producto.id)}
+            className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors"
+            style={{ backgroundColor: producto.activo ? '#1B3A2A' : '#D1D5DB' }}
+            aria-label={producto.activo ? 'Desactivar' : 'Activar'}
+          >
+            <span
+              className="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+              style={{ transform: producto.activo ? 'translateX(24px)' : 'translateX(4px)' }}
+            />
+          </button>
+        </div>
       </div>
     </div>
   )
 }
 
-function IconBack() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="15,18 9,12 15,6" />
-    </svg>
-  )
+// ─── Estado inicial del formulario ────────────────────────────────────────────
+
+type FormUnidad = 'kg' | 'unidad' | 'caja'
+
+interface FormState {
+  nombre: string
+  precio: string
+  stock: string
+  unidad: FormUnidad
+  descripcion: string
+  disponible: boolean
 }
+
+const FORM_VACIO: FormState = {
+  nombre: '',
+  precio: '',
+  stock: '',
+  unidad: 'kg',
+  descripcion: '',
+  disponible: true,
+}
+
+// ─── Página ───────────────────────────────────────────────────────────────────
 
 export default function MiCatalogoPage() {
   const navigate = useNavigate()
@@ -121,15 +194,104 @@ export default function MiCatalogoPage() {
   )
   const [showAlbaranModal, setShowAlbaranModal] = useState(false)
 
+  const [showModal, setShowModal] = useState(false)
+  const [productoEditar, setProductoEditar] = useState<Producto | null>(null)
+  const [form, setForm] = useState<FormState>(FORM_VACIO)
+  const [formError, setFormError] = useState('')
+
+  const [confirmEliminarId, setConfirmEliminarId] = useState<string | null>(null)
+
+  const [toastMsg, setToastMsg] = useState<string | null>(null)
+  useEffect(() => {
+    if (!toastMsg) return
+    const t = setTimeout(() => setToastMsg(null), 2500)
+    return () => clearTimeout(t)
+  }, [toastMsg])
+
   function handleToggle(id: string) {
     setProductos((prev) =>
       prev.map((p) => (p.id === id ? { ...p, activo: !p.activo } : p)),
     )
   }
 
+  function openAdd() {
+    setForm(FORM_VACIO)
+    setProductoEditar(null)
+    setFormError('')
+    setShowModal(true)
+  }
+
+  function openEdit(producto: Producto) {
+    const unidad: FormUnidad =
+      producto.unidad === 'kg' || producto.unidad === 'unidad' || producto.unidad === 'caja'
+        ? producto.unidad
+        : 'kg'
+    setForm({
+      nombre: producto.nombre,
+      precio: String(producto.precio),
+      stock: String(producto.stockDisponible),
+      unidad,
+      descripcion: producto.descripcion ?? '',
+      disponible: producto.activo,
+    })
+    setProductoEditar(producto)
+    setFormError('')
+    setShowModal(true)
+  }
+
+  function handleSubmit() {
+    const nombre = form.nombre.trim()
+    const precio = parseFloat(form.precio.replace(',', '.'))
+    const stock = parseInt(form.stock, 10)
+    if (!nombre) { setFormError('El nombre es obligatorio'); return }
+    if (isNaN(precio) || precio < 0) { setFormError('Precio no valido'); return }
+    if (isNaN(stock) || stock < 0) { setFormError('Stock no valido'); return }
+    setFormError('')
+
+    if (productoEditar) {
+      setProductos((prev) =>
+        prev.map((p) =>
+          p.id === productoEditar.id
+            ? {
+                ...p,
+                nombre,
+                precio,
+                stockDisponible: stock,
+                unidad: form.unidad as Unidad,
+                descripcion: form.descripcion.trim() || undefined,
+                activo: form.disponible,
+              }
+            : p,
+        ),
+      )
+      setToastMsg('Producto actualizado')
+    } else {
+      const nuevo: Producto = {
+        id: 'local-' + Date.now(),
+        proveedorId: miProveedor?.id ?? '',
+        nombre,
+        precio,
+        unidad: form.unidad as Unidad,
+        stockDisponible: stock,
+        descripcion: form.descripcion.trim() || undefined,
+        activo: form.disponible,
+      }
+      setProductos((prev) => [...prev, nuevo])
+      setToastMsg('Producto añadido')
+    }
+    setShowModal(false)
+  }
+
+  function handleDelete() {
+    if (!confirmEliminarId) return
+    setProductos((prev) => prev.filter((p) => p.id !== confirmEliminarId))
+    setConfirmEliminarId(null)
+    setToastMsg('Producto eliminado')
+  }
+
   if (!miProveedor) {
     return (
-      <div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100vh', fontFamily:'Inter, sans-serif', color:'#6B7280'}}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'Inter, sans-serif', color: '#6B7280' }}>
         Cargando...
       </div>
     )
@@ -140,6 +302,22 @@ export default function MiCatalogoPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
+      {/* Toast */}
+      {toastMsg && (
+        <div
+          className="fixed top-4 left-1/2 z-50 px-5 py-2.5 text-white text-sm font-medium"
+          style={{
+            transform: 'translateX(-50%)',
+            backgroundColor: '#1B3A2A',
+            borderRadius: 20,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {toastMsg}
+        </div>
+      )}
+
       {/* Cabecera */}
       <div className="px-4 pt-4 pb-5" style={{ backgroundColor: '#1B3A2A' }}>
         <div className="flex items-center gap-2 mb-3">
@@ -151,11 +329,11 @@ export default function MiCatalogoPage() {
             <IconBack />
           </button>
           <button
-            onClick={() => navigate('/app/proveedor')}
-            className="text-[11px] font-bold"
-            style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}
+            onClick={() => navigate('/')}
+            className="block text-left"
           >
-            MercaOnline
+            <span className="text-[11px] font-bold" style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}>MercaOnline</span>
+            <span className="text-[9px] block mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Inicio</span>
           </button>
         </div>
         <div className="flex items-center justify-between">
@@ -178,13 +356,14 @@ export default function MiCatalogoPage() {
               borderRadius: 20,
             }}
           >
-            {miProveedor.estadoAprobacion === 'aprobado' ? 'Activo' : 'Pendiente aprobación'}
+            {miProveedor.estadoAprobacion === 'aprobado' ? 'Activo' : 'Pendiente aprobacion'}
           </span>
         </div>
 
         {/* Botones */}
         <div className="mt-4 flex items-center gap-3 flex-wrap">
           <button
+            onClick={openAdd}
             className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white transition-opacity active:opacity-80"
             style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
           >
@@ -197,7 +376,7 @@ export default function MiCatalogoPage() {
             style={{ backgroundColor: '#FFFFFF', color: '#1B3A2A', border: '1.5px solid #1B3A2A', borderRadius: 12 }}
           >
             <IconCamera />
-            Subir albarán
+            Subir albaran
           </button>
         </div>
       </div>
@@ -212,7 +391,7 @@ export default function MiCatalogoPage() {
             <IconInfo />
           </span>
           <p className="text-sm" style={{ color: '#92400E' }}>
-            Tu solicitud está en revisión. Recibirás acceso completo en 24–48 h.
+            Tu solicitud esta en revision. Recibiras acceso completo en 24-48 h.
           </p>
         </div>
       )}
@@ -226,7 +405,13 @@ export default function MiCatalogoPage() {
             </p>
             <div className="space-y-3">
               {productos.map((producto) => (
-                <ProductoCard key={producto.id} producto={producto} onToggle={handleToggle} />
+                <ProductoCard
+                  key={producto.id}
+                  producto={producto}
+                  onToggle={handleToggle}
+                  onEdit={openEdit}
+                  onDelete={(id) => setConfirmEliminarId(id)}
+                />
               ))}
             </div>
           </>
@@ -236,12 +421,13 @@ export default function MiCatalogoPage() {
               <IconPackage />
             </div>
             <h2 className="text-lg font-bold font-serif mb-2" style={{ color: '#222222' }}>
-              Sin productos todavía
+              Sin productos todavia
             </h2>
             <p className="text-sm mb-6" style={{ color: '#6B7280' }}>
               Añade tus productos para que los fruteros puedan pedirlos.
             </p>
             <button
+              onClick={openAdd}
               className="text-sm font-semibold px-5 py-3 text-white"
               style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
             >
@@ -253,7 +439,7 @@ export default function MiCatalogoPage() {
 
       <BottomNavProveedor />
 
-      {/* Modal albarán OCR */}
+      {/* Modal albaran OCR */}
       {showAlbaranModal && (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center sm:items-center px-4 pb-6"
@@ -266,7 +452,7 @@ export default function MiCatalogoPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Subir albarán</h2>
+              <h2 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Subir albaran</h2>
               <button
                 onClick={() => setShowAlbaranModal(false)}
                 className="w-8 h-8 flex items-center justify-center"
@@ -276,7 +462,7 @@ export default function MiCatalogoPage() {
               </button>
             </div>
             <p className="text-sm mb-6" style={{ color: '#6B7280' }}>
-              Fotografía tu albarán y generaremos el stock automáticamente
+              Fotografía tu albaran y generaremos el stock automaticamente
             </p>
             <button
               className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold"
@@ -286,8 +472,210 @@ export default function MiCatalogoPage() {
               Seleccionar foto
             </button>
             <p className="text-center text-xs mt-4" style={{ color: '#9CA3AF' }}>
-              Próximamente disponible
+              Proximamente disponible
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Modal añadir / editar producto */}
+      {showModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center sm:items-center px-4 pb-6"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="bg-white w-full max-w-sm pt-6 pb-8"
+            style={{ borderRadius: 20, maxHeight: '92vh', overflowY: 'auto' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-5 px-6">
+              <h2 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>
+                {productoEditar ? 'Editar producto' : 'Nuevo producto'}
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="w-8 h-8 flex items-center justify-center"
+                style={{ color: '#6B7280', backgroundColor: '#F0F5F1', borderRadius: 8 }}
+              >
+                <IconX />
+              </button>
+            </div>
+
+            <div className="px-6 space-y-4">
+              {/* Nombre */}
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wide block mb-1.5" style={{ color: '#6B7280', letterSpacing: '0.08em' }}>
+                  Nombre del producto <span style={{ color: '#DC2626' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej. Naranjas Valencia"
+                  value={form.nombre}
+                  onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
+                  className="w-full px-4 py-3 text-sm outline-none"
+                  style={{ border: '1.5px solid #E5E7EB', borderRadius: 12, color: '#222222', backgroundColor: '#FFFFFF' }}
+                />
+              </div>
+
+              {/* Precio y unidad */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wide block mb-1.5" style={{ color: '#6B7280', letterSpacing: '0.08em' }}>
+                    Precio <span style={{ color: '#DC2626' }}>*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      value={form.precio}
+                      onChange={(e) => setForm((f) => ({ ...f, precio: e.target.value }))}
+                      className="w-full px-4 py-3 text-sm outline-none pr-8"
+                      style={{ border: '1.5px solid #E5E7EB', borderRadius: 12, color: '#222222', backgroundColor: '#FFFFFF' }}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: '#9CA3AF' }}>€</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wide block mb-1.5" style={{ color: '#6B7280', letterSpacing: '0.08em' }}>
+                    Unidad
+                  </label>
+                  <select
+                    value={form.unidad}
+                    onChange={(e) => setForm((f) => ({ ...f, unidad: e.target.value as FormUnidad }))}
+                    className="w-full px-3 py-3 text-sm outline-none"
+                    style={{ border: '1.5px solid #E5E7EB', borderRadius: 12, color: '#222222', backgroundColor: '#FFFFFF', appearance: 'none' }}
+                  >
+                    <option value="kg">kg</option>
+                    <option value="unidad">unidad</option>
+                    <option value="caja">caja</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Stock */}
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wide block mb-1.5" style={{ color: '#6B7280', letterSpacing: '0.08em' }}>
+                  Stock disponible mañana <span style={{ color: '#DC2626' }}>*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="0"
+                    min="0"
+                    value={form.stock}
+                    onChange={(e) => setForm((f) => ({ ...f, stock: e.target.value }))}
+                    className="w-full px-4 py-3 text-sm outline-none pr-14"
+                    style={{ border: '1.5px solid #E5E7EB', borderRadius: 12, color: '#222222', backgroundColor: '#FFFFFF' }}
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: '#9CA3AF' }}>{form.unidad}</span>
+                </div>
+              </div>
+
+              {/* Descripcion */}
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wide block mb-1.5" style={{ color: '#6B7280', letterSpacing: '0.08em' }}>
+                  Descripcion breve{' '}
+                  <span className="font-normal normal-case" style={{ color: '#9CA3AF' }}>(opcional)</span>
+                </label>
+                <textarea
+                  placeholder="Ej. Cosecha propia, calibre grande"
+                  value={form.descripcion}
+                  onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))}
+                  rows={2}
+                  className="w-full px-4 py-3 text-sm outline-none resize-none"
+                  style={{ border: '1.5px solid #E5E7EB', borderRadius: 12, color: '#222222', backgroundColor: '#FFFFFF' }}
+                />
+              </div>
+
+              {/* Toggle disponible */}
+              <div
+                className="flex items-center justify-between py-3"
+                style={{ borderTop: '1px solid #F3F4F6', borderBottom: '1px solid #F3F4F6' }}
+              >
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#222222' }}>Disponible mañana</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#6B7280' }}>El producto aparece en el catalogo</p>
+                </div>
+                <button
+                  onClick={() => setForm((f) => ({ ...f, disponible: !f.disponible }))}
+                  className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors"
+                  style={{ backgroundColor: form.disponible ? '#1B3A2A' : '#D1D5DB' }}
+                >
+                  <span
+                    className="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                    style={{ transform: form.disponible ? 'translateX(24px)' : 'translateX(4px)' }}
+                  />
+                </button>
+              </div>
+
+              {/* Error */}
+              {formError && (
+                <p className="text-sm text-center" style={{ color: '#DC2626' }}>{formError}</p>
+              )}
+
+              {/* Botones */}
+              <div className="flex gap-3 pt-1">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 py-3 text-sm font-semibold"
+                  style={{ backgroundColor: '#F3F4F6', color: '#6B7280', borderRadius: 12 }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="flex-1 py-3 text-sm font-semibold text-white"
+                  style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
+                >
+                  {productoEditar ? 'Guardar cambios' : 'Añadir producto'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmacion eliminar */}
+      {confirmEliminarId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-6"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setConfirmEliminarId(null)}
+        >
+          <div
+            className="bg-white w-full max-w-xs px-6 py-6"
+            style={{ borderRadius: 20 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold font-serif mb-2" style={{ color: '#222222' }}>
+              Eliminar producto
+            </h3>
+            <p className="text-sm mb-5" style={{ color: '#6B7280' }}>
+              Esta accion no se puede deshacer.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmEliminarId(null)}
+                className="flex-1 py-3 text-sm font-semibold"
+                style={{ backgroundColor: '#F3F4F6', color: '#6B7280', borderRadius: 12 }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 py-3 text-sm font-semibold text-white"
+                style={{ backgroundColor: '#DC2626', borderRadius: 12 }}
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
         </div>
       )}

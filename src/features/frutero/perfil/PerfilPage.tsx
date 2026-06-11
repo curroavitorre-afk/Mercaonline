@@ -100,11 +100,11 @@ export default function PerfilPage() {
         style={{ backgroundColor: '#1B3A2A' }}
       >
         <button
-          onClick={() => navigate('/app/frutero')}
-          className="text-[11px] font-bold block mb-4"
-          style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}
+          onClick={() => navigate('/')}
+          className="block mb-4 text-left"
         >
-          MercaOnline
+          <span className="text-[11px] font-bold" style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}>MercaOnline</span>
+          <span className="text-[9px] block mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Inicio</span>
         </button>
         <div className="absolute top-4 right-4">
           <CartIcon iconColor="white" />

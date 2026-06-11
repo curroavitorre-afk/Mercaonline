@@ -168,11 +168,11 @@ export default function EstadoPage() {
             <IconBack />
           </button>
           <button
-            onClick={() => navigate('/app/repartidor')}
-            className="text-[11px] font-bold"
-            style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}
+            onClick={() => navigate('/')}
+            className="block text-left"
           >
-            MercaOnline
+            <span className="text-[11px] font-bold" style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}>MercaOnline</span>
+            <span className="text-[9px] block mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Inicio</span>
           </button>
         </div>
         <h1

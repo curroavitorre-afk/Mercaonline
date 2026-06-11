@@ -118,11 +118,11 @@ export default function RutaPage() {
       {/* Header */}
       <header className="px-5 pt-12 pb-6" style={{ backgroundColor: '#1B3A2A' }}>
         <button
-          onClick={() => navigate('/app/repartidor')}
-          className="text-[11px] font-bold block mb-3"
-          style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}
+          onClick={() => navigate('/')}
+          className="block mb-3 text-left"
         >
-          MercaOnline
+          <span className="text-[11px] font-bold" style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}>MercaOnline</span>
+          <span className="text-[9px] block mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Inicio</span>
         </button>
         <div className="flex items-start justify-between gap-3">
           <div>

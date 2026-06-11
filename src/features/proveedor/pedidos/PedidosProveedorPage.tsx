@@ -107,11 +107,11 @@ export default function PedidosProveedorPage() {
             <IconBack />
           </button>
           <button
-            onClick={() => navigate('/app/proveedor')}
-            className="text-[11px] font-semibold"
-            style={{ color: '#1B3A2A', fontFamily: 'Fraunces, serif' }}
+            onClick={() => navigate('/')}
+            className="block text-left"
           >
-            MercaOnline
+            <span className="text-[11px] font-semibold" style={{ color: '#1B3A2A', fontFamily: 'Fraunces, serif' }}>MercaOnline</span>
+            <span className="text-[9px] block mt-0.5" style={{ color: '#9CA3AF' }}>Inicio</span>
           </button>
         </div>
         <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Pedidos recibidos</h1>
