@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
 import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
+import { useAuthStore } from '@/lib/stores/auth'
 
 interface Puesto {
   id: number
@@ -17,61 +18,70 @@ interface Puesto {
 const PUESTOS: Puesto[] = [
   {
     id: 1,
-    nombre: 'Frutas García',
-    especialidad: 'Cítricos y fruta de temporada',
-    pabellon: 'A',
-    numPuesto: '12',
-    foto: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=800&q=90&fit=crop',
+    nombre: 'Frutas Macías Vera',
+    especialidad: 'Frutas y verduras variadas, cítricos y tropicales',
+    pabellon: '',
+    numPuesto: '117 · 137',
+    foto: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab12?w=800&q=90&fit=crop',
     disponibilidad: 'mañana',
   },
   {
     id: 2,
-    nombre: 'Verduras López',
-    especialidad: 'Verdura de hoja y tomate',
-    pabellon: 'B',
-    numPuesto: '7',
-    foto: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&q=90&fit=crop',
+    nombre: 'Frutas Martín Mariscal',
+    especialidad: 'Fruta de temporada nacional',
+    pabellon: '',
+    numPuesto: '113 · 114 · 115 · 116',
+    foto: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&q=90&fit=crop',
     disponibilidad: 'mañana',
   },
   {
     id: 3,
-    nombre: 'Finca El Olivo',
-    especialidad: 'Melocotón, cereza y fruta de hueso',
-    pabellon: 'A',
-    numPuesto: '3',
-    foto: 'https://images.unsplash.com/photo-1528821128474-27f963b062bf?w=800&q=90&fit=crop',
-    disponibilidad: 'pocas',
+    nombre: 'Hermanos Gallegos e Hijos',
+    especialidad: 'Verdura de hoja y hortalizas',
+    pabellon: '',
+    numPuesto: '111 · 131 · 132 · 133',
+    foto: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&q=90&fit=crop',
+    disponibilidad: 'mañana',
   },
   {
     id: 4,
-    nombre: 'Hermanos Ruiz',
-    especialidad: 'Plátano de Canarias y fruta tropical',
-    pabellon: 'C',
-    numPuesto: '15',
-    foto: 'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=800&q=90&fit=crop',
+    nombre: 'Importpatata',
+    especialidad: 'Patata, cebolla y tubérculos',
+    pabellon: '',
+    numPuesto: '105 · 106 · 107',
+    foto: 'https://images.unsplash.com/photo-1518977676405-d4b5e4c55f8e?w=800&q=90&fit=crop',
     disponibilidad: 'mañana',
   },
   {
     id: 5,
-    nombre: 'La Huerta de Loja',
-    especialidad: 'Producto local: pimiento, pepino, calabacín',
-    pabellon: 'B',
-    numPuesto: '2',
-    foto: 'https://images.unsplash.com/photo-1518977676405-d4b5e4c55f8e?w=800&q=90&fit=crop',
+    nombre: 'Frutas del Pino',
+    especialidad: 'Plátano de Canarias y fruta tropical importada',
+    pabellon: '',
+    numPuesto: '139',
+    foto: 'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=800&q=90&fit=crop',
     disponibilidad: 'pocas',
   },
   {
     id: 6,
-    nombre: 'Distribuciones Nazarí',
-    especialidad: 'Granada, higo y fruta autóctona',
-    pabellon: 'D',
-    numPuesto: '9',
-    foto: 'https://images.unsplash.com/photo-1601379327928-bedfaf9da2d0?w=800&q=90&fit=crop',
+    nombre: 'Hortifrut Granada',
+    especialidad: 'Producto local Granada — verdura de la Vega',
+    pabellon: '',
+    numPuesto: '101 · 120 · 228-230',
+    foto: 'https://images.unsplash.com/photo-1506484381205-f7945653044d?w=800&q=90&fit=crop',
     disponibilidad: 'mañana',
   },
 ]
 
 const FILTROS = ['Todos', 'Cítricos', 'Verdura', 'Tropical', 'Hueso', 'Local']
+
+function IconClock() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12,6 12,12 16,14" />
+    </svg>
+  )
+}
 
 function IconSearch() {
   return (
@@ -93,6 +103,7 @@ function IconLocation() {
 
 export default function CatalogoPage() {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
   const bottomNavHeight = useBottomNavHeight()
   const [busqueda, setBusqueda] = useState('')
   const [filtroActivo, setFiltroActivo] = useState('Todos')
@@ -105,6 +116,25 @@ export default function CatalogoPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
+      {/* Saludo */}
+      <div className="px-4 pt-5 pb-5" style={{ backgroundColor: '#1B3A2A' }}>
+        <h1 className="text-2xl font-bold text-white font-serif mb-1">
+          Buenos días, {user?.nombre ?? 'frutero'}
+        </h1>
+        <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          ¿Qué necesitas para mañana?
+        </p>
+        <div
+          className="inline-flex items-center gap-1.5 px-3 py-1.5"
+          style={{ backgroundColor: 'rgba(242,140,40,0.15)', borderRadius: 20, border: '1px solid rgba(242,140,40,0.35)' }}
+        >
+          <span style={{ color: '#F28C28' }}><IconClock /></span>
+          <span className="text-xs font-semibold" style={{ color: '#F28C28' }}>
+            Haz tu pedido antes de las 23:00
+          </span>
+        </div>
+      </div>
+
       {/* Cabecera */}
       <div className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
         <div className="flex items-center justify-between mb-3">
@@ -202,7 +232,7 @@ export default function CatalogoPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1" style={{ color: '#6B7280' }}>
                   <IconLocation />
-                  <span className="text-xs">Pabellón {puesto.pabellon} · Puesto {puesto.numPuesto}</span>
+                  <span className="text-xs">Puestos {puesto.numPuesto}</span>
                 </div>
                 <button
                   onClick={() => navigate(`/app/frutero/catalogo/${puesto.id}`)}

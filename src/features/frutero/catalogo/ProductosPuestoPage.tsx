@@ -14,81 +14,80 @@ interface PuestoData {
 const PUESTOS_DATA: Record<string, PuestoData> = {
   '1': {
     proveedor: {
-      id: 'mock-p1', userId: 'mock-u1', nombre: 'Frutas García',
-      descripcion: 'Cítricos y fruta de temporada', activo: true, estadoAprobacion: 'aprobado',
+      id: 'mock-p1', userId: 'mock-u1', nombre: 'Frutas Macías Vera',
+      descripcion: 'Frutas y verduras variadas, cítricos y tropicales', activo: true, estadoAprobacion: 'aprobado',
     },
     productos: [
-      { id: 'mg-1-1', proveedorId: 'mock-p1', nombre: 'Naranjas Valencia', precio: 0.85, unidad: 'kg', stockDisponible: 200, activo: true },
-      { id: 'mg-1-2', proveedorId: 'mock-p1', nombre: 'Limones de Murcia', precio: 1.20, unidad: 'kg', stockDisponible: 80, activo: true },
-      { id: 'mg-1-3', proveedorId: 'mock-p1', nombre: 'Mandarinas', precio: 1.10, unidad: 'kg', stockDisponible: 150, activo: true },
-      { id: 'mg-1-4', proveedorId: 'mock-p1', nombre: 'Pomelo', precio: 0.95, unidad: 'kg', stockDisponible: 60, activo: true },
-      { id: 'mg-1-5', proveedorId: 'mock-p1', nombre: 'Kiwi Hayward', precio: 3.50, unidad: 'kg', stockDisponible: 40, activo: true },
+      { id: 'mg-1-1', proveedorId: 'mock-p1', nombre: 'Naranjas Valencia', precio: 0.45, unidad: 'kg', stockDisponible: 500, activo: true },
+      { id: 'mg-1-2', proveedorId: 'mock-p1', nombre: 'Limones', precio: 0.55, unidad: 'kg', stockDisponible: 300, activo: true },
+      { id: 'mg-1-3', proveedorId: 'mock-p1', nombre: 'Mandarinas', precio: 0.65, unidad: 'kg', stockDisponible: 400, activo: true },
+      { id: 'mg-1-4', proveedorId: 'mock-p1', nombre: 'Aguacates', precio: 1.80, unidad: 'kg', stockDisponible: 150, activo: true },
+      { id: 'mg-1-5', proveedorId: 'mock-p1', nombre: 'Mangos', precio: 1.50, unidad: 'kg', stockDisponible: 100, activo: true },
     ],
   },
   '2': {
     proveedor: {
-      id: 'mock-p2', userId: 'mock-u2', nombre: 'Verduras López',
-      descripcion: 'Verdura de hoja y tomate', activo: true, estadoAprobacion: 'aprobado',
+      id: 'mock-p2', userId: 'mock-u2', nombre: 'Frutas Martín Mariscal',
+      descripcion: 'Fruta de temporada nacional', activo: true, estadoAprobacion: 'aprobado',
     },
     productos: [
-      { id: 'mg-2-1', proveedorId: 'mock-p2', nombre: 'Tomate rama', precio: 1.80, unidad: 'kg', stockDisponible: 120, activo: true },
-      { id: 'mg-2-2', proveedorId: 'mock-p2', nombre: 'Lechuga iceberg', precio: 0.90, unidad: 'unidad', stockDisponible: 80, activo: true },
-      { id: 'mg-2-3', proveedorId: 'mock-p2', nombre: 'Espinacas baby', precio: 2.20, unidad: 'kg', stockDisponible: 50, activo: true },
-      { id: 'mg-2-4', proveedorId: 'mock-p2', nombre: 'Pimiento rojo', precio: 1.60, unidad: 'kg', stockDisponible: 90, activo: true },
-      { id: 'mg-2-5', proveedorId: 'mock-p2', nombre: 'Pepino', precio: 0.70, unidad: 'kg', stockDisponible: 110, activo: true },
-      { id: 'mg-2-6', proveedorId: 'mock-p2', nombre: 'Acelgas', precio: 1.40, unidad: 'manojos', stockDisponible: 40, activo: true },
+      { id: 'mg-2-1', proveedorId: 'mock-p2', nombre: 'Fresas Huelva', precio: 1.20, unidad: 'kg', stockDisponible: 200, activo: true },
+      { id: 'mg-2-2', proveedorId: 'mock-p2', nombre: 'Melocotones', precio: 0.90, unidad: 'kg', stockDisponible: 300, activo: true },
+      { id: 'mg-2-3', proveedorId: 'mock-p2', nombre: 'Nectarinas', precio: 0.85, unidad: 'kg', stockDisponible: 250, activo: true },
+      { id: 'mg-2-4', proveedorId: 'mock-p2', nombre: 'Ciruelas', precio: 0.95, unidad: 'kg', stockDisponible: 180, activo: true },
+      { id: 'mg-2-5', proveedorId: 'mock-p2', nombre: 'Cerezas', precio: 3.50, unidad: 'kg', stockDisponible: 80, activo: true },
     ],
   },
   '3': {
     proveedor: {
-      id: 'mock-p3', userId: 'mock-u3', nombre: 'Finca El Olivo',
-      descripcion: 'Melocotón, cereza y fruta de hueso', activo: true, estadoAprobacion: 'aprobado',
+      id: 'mock-p3', userId: 'mock-u3', nombre: 'Hermanos Gallegos e Hijos',
+      descripcion: 'Verdura de hoja y hortalizas', activo: true, estadoAprobacion: 'aprobado',
     },
     productos: [
-      { id: 'mg-3-1', proveedorId: 'mock-p3', nombre: 'Melocotón de Calanda', precio: 2.80, unidad: 'kg', stockDisponible: 60, activo: true },
-      { id: 'mg-3-2', proveedorId: 'mock-p3', nombre: 'Cereza del Jerte', precio: 5.50, unidad: 'kg', stockDisponible: 30, activo: true },
-      { id: 'mg-3-3', proveedorId: 'mock-p3', nombre: 'Nectarina', precio: 2.20, unidad: 'kg', stockDisponible: 80, activo: true },
-      { id: 'mg-3-4', proveedorId: 'mock-p3', nombre: 'Ciruela roja', precio: 2.50, unidad: 'kg', stockDisponible: 50, activo: true },
-      { id: 'mg-3-5', proveedorId: 'mock-p3', nombre: 'Albaricoque', precio: 2.00, unidad: 'kg', stockDisponible: 70, activo: true },
+      { id: 'mg-3-1', proveedorId: 'mock-p3', nombre: 'Tomates rama', precio: 0.70, unidad: 'kg', stockDisponible: 600, activo: true },
+      { id: 'mg-3-2', proveedorId: 'mock-p3', nombre: 'Pimientos rojos', precio: 0.65, unidad: 'kg', stockDisponible: 400, activo: true },
+      { id: 'mg-3-3', proveedorId: 'mock-p3', nombre: 'Pepinos', precio: 0.40, unidad: 'kg', stockDisponible: 350, activo: true },
+      { id: 'mg-3-4', proveedorId: 'mock-p3', nombre: 'Lechugas', precio: 0.45, unidad: 'ud', stockDisponible: 300, activo: true },
+      { id: 'mg-3-5', proveedorId: 'mock-p3', nombre: 'Judías verdes', precio: 1.10, unidad: 'kg', stockDisponible: 200, activo: true },
     ],
   },
   '4': {
     proveedor: {
-      id: 'mock-p4', userId: 'mock-u4', nombre: 'Hermanos Ruiz',
-      descripcion: 'Plátano de Canarias y fruta tropical', activo: true, estadoAprobacion: 'aprobado',
+      id: 'mock-p4', userId: 'mock-u4', nombre: 'Importpatata',
+      descripcion: 'Patata, cebolla y tubérculos', activo: true, estadoAprobacion: 'aprobado',
     },
     productos: [
-      { id: 'mg-4-1', proveedorId: 'mock-p4', nombre: 'Plátano de Canarias', precio: 1.90, unidad: 'kg', stockDisponible: 200, activo: true },
-      { id: 'mg-4-2', proveedorId: 'mock-p4', nombre: 'Mango Keitt', precio: 3.20, unidad: 'kg', stockDisponible: 45, activo: true },
-      { id: 'mg-4-3', proveedorId: 'mock-p4', nombre: 'Piña Golden', precio: 1.80, unidad: 'unidad', stockDisponible: 30, activo: true },
-      { id: 'mg-4-4', proveedorId: 'mock-p4', nombre: 'Papaya', precio: 2.60, unidad: 'kg', stockDisponible: 25, activo: true },
-      { id: 'mg-4-5', proveedorId: 'mock-p4', nombre: 'Aguacate Hass', precio: 3.80, unidad: 'kg', stockDisponible: 60, activo: true },
+      { id: 'mg-4-1', proveedorId: 'mock-p4', nombre: 'Patata blanca', precio: 0.35, unidad: 'kg', stockDisponible: 1000, activo: true },
+      { id: 'mg-4-2', proveedorId: 'mock-p4', nombre: 'Patata nueva', precio: 0.55, unidad: 'kg', stockDisponible: 800, activo: true },
+      { id: 'mg-4-3', proveedorId: 'mock-p4', nombre: 'Cebolla', precio: 0.30, unidad: 'kg', stockDisponible: 900, activo: true },
+      { id: 'mg-4-4', proveedorId: 'mock-p4', nombre: 'Ajo morado', precio: 2.50, unidad: 'kg', stockDisponible: 200, activo: true },
+      { id: 'mg-4-5', proveedorId: 'mock-p4', nombre: 'Boniato', precio: 0.60, unidad: 'kg', stockDisponible: 400, activo: true },
     ],
   },
   '5': {
     proveedor: {
-      id: 'mock-p5', userId: 'mock-u5', nombre: 'La Huerta de Loja',
-      descripcion: 'Producto local: pimiento, pepino, calabacín', activo: true, estadoAprobacion: 'aprobado',
+      id: 'mock-p5', userId: 'mock-u5', nombre: 'Frutas del Pino',
+      descripcion: 'Plátano de Canarias y fruta tropical importada', activo: true, estadoAprobacion: 'aprobado',
     },
     productos: [
-      { id: 'mg-5-1', proveedorId: 'mock-p5', nombre: 'Pimiento de Loja', precio: 1.40, unidad: 'kg', stockDisponible: 100, activo: true },
-      { id: 'mg-5-2', proveedorId: 'mock-p5', nombre: 'Pepino largo', precio: 0.65, unidad: 'kg', stockDisponible: 90, activo: true },
-      { id: 'mg-5-3', proveedorId: 'mock-p5', nombre: 'Calabacín', precio: 0.80, unidad: 'kg', stockDisponible: 120, activo: true },
-      { id: 'mg-5-4', proveedorId: 'mock-p5', nombre: 'Berenjena', precio: 1.10, unidad: 'kg', stockDisponible: 80, activo: true },
-      { id: 'mg-5-5', proveedorId: 'mock-p5', nombre: 'Judía verde', precio: 2.50, unidad: 'kg', stockDisponible: 50, activo: true },
+      { id: 'mg-5-1', proveedorId: 'mock-p5', nombre: 'Plátanos Canarias', precio: 0.85, unidad: 'kg', stockDisponible: 500, activo: true },
+      { id: 'mg-5-2', proveedorId: 'mock-p5', nombre: 'Piñas', precio: 0.95, unidad: 'ud', stockDisponible: 150, activo: true },
+      { id: 'mg-5-3', proveedorId: 'mock-p5', nombre: 'Papayas', precio: 1.20, unidad: 'kg', stockDisponible: 100, activo: true },
+      { id: 'mg-5-4', proveedorId: 'mock-p5', nombre: 'Cocos', precio: 1.50, unidad: 'ud', stockDisponible: 80, activo: true },
+      { id: 'mg-5-5', proveedorId: 'mock-p5', nombre: 'Kiwis', precio: 1.10, unidad: 'kg', stockDisponible: 200, activo: true },
     ],
   },
   '6': {
     proveedor: {
-      id: 'mock-p6', userId: 'mock-u6', nombre: 'Distribuciones Nazarí',
-      descripcion: 'Granada, higo y fruta autóctona', activo: true, estadoAprobacion: 'aprobado',
+      id: 'mock-p6', userId: 'mock-u6', nombre: 'Hortifrut Granada',
+      descripcion: 'Producto local Granada — verdura de la Vega', activo: true, estadoAprobacion: 'aprobado',
     },
     productos: [
-      { id: 'mg-6-1', proveedorId: 'mock-p6', nombre: 'Granada Mollar', precio: 1.50, unidad: 'kg', stockDisponible: 150, activo: true },
-      { id: 'mg-6-2', proveedorId: 'mock-p6', nombre: 'Higo negro', precio: 3.20, unidad: 'kg', stockDisponible: 40, activo: true },
-      { id: 'mg-6-3', proveedorId: 'mock-p6', nombre: 'Caqui Rojo Brillante', precio: 2.00, unidad: 'kg', stockDisponible: 70, activo: true },
-      { id: 'mg-6-4', proveedorId: 'mock-p6', nombre: 'Chirimoyo', precio: 4.50, unidad: 'kg', stockDisponible: 20, activo: true },
-      { id: 'mg-6-5', proveedorId: 'mock-p6', nombre: 'Uva moscatel', precio: 2.80, unidad: 'kg', stockDisponible: 60, activo: true },
+      { id: 'mg-6-1', proveedorId: 'mock-p6', nombre: 'Calabacín', precio: 0.45, unidad: 'kg', stockDisponible: 400, activo: true },
+      { id: 'mg-6-2', proveedorId: 'mock-p6', nombre: 'Berenjena', precio: 0.55, unidad: 'kg', stockDisponible: 300, activo: true },
+      { id: 'mg-6-3', proveedorId: 'mock-p6', nombre: 'Pimiento verde', precio: 0.50, unidad: 'kg', stockDisponible: 500, activo: true },
+      { id: 'mg-6-4', proveedorId: 'mock-p6', nombre: 'Habas', precio: 1.80, unidad: 'kg', stockDisponible: 150, activo: true },
+      { id: 'mg-6-5', proveedorId: 'mock-p6', nombre: 'Espárragos trigueros', precio: 2.20, unidad: 'kg', stockDisponible: 100, activo: true },
     ],
   },
 }
@@ -238,7 +237,11 @@ export default function ProductosPuestoPage() {
               </div>
               <div
                 className="shrink-0 px-2.5 py-1 text-[11px] font-medium"
-                style={{ backgroundColor: '#F0F5F1', color: '#1B3A2A', borderRadius: 8 }}
+                style={{
+                  backgroundColor: producto.stockDisponible <= 100 ? 'rgba(242,140,40,0.12)' : '#F0F5F1',
+                  color: producto.stockDisponible <= 100 ? '#F28C28' : '#1B3A2A',
+                  borderRadius: 8,
+                }}
               >
                 {producto.stockDisponible} {producto.unidad} mañana
               </div>
@@ -266,6 +269,11 @@ export default function ProductosPuestoPage() {
                 </button>
               </div>
 
+              {/* Precio total línea */}
+              <span className="text-sm font-bold font-serif shrink-0" style={{ color: '#1B3A2A', minWidth: 54, textAlign: 'right' }}>
+                {((cantidades[producto.id] ?? 1) * producto.precio).toFixed(2)} €
+              </span>
+
               {/* Botón añadir */}
               <button
                 onClick={() => handleAnadir(producto)}
@@ -274,7 +282,7 @@ export default function ProductosPuestoPage() {
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#D97A1E')}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#F28C28')}
               >
-                Añadir al carrito
+                Añadir
               </button>
             </div>
           </div>

@@ -34,6 +34,24 @@ function IconInfo() {
   )
 }
 
+function IconCamera() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+      <circle cx="12" cy="13" r="4" />
+    </svg>
+  )
+}
+
+function IconX() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  )
+}
+
 interface ProductoCardProps {
   producto: Producto
   onToggle: (id: string) => void
@@ -93,6 +111,7 @@ export default function MiCatalogoPage() {
   const [productos, setProductos] = useState<Producto[]>(
     MOCK_PRODUCTOS.filter((p) => p.proveedorId === (miProveedor?.id ?? '')),
   )
+  const [showAlbaranModal, setShowAlbaranModal] = useState(false)
 
   function handleToggle(id: string) {
     setProductos((prev) =>
@@ -139,14 +158,24 @@ export default function MiCatalogoPage() {
           </span>
         </div>
 
-        {/* Botón añadir */}
-        <button
-          className="mt-4 flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white transition-opacity active:opacity-80"
-          style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
-        >
-          <IconPlus />
-          Añadir producto
-        </button>
+        {/* Botones */}
+        <div className="mt-4 flex items-center gap-3 flex-wrap">
+          <button
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white transition-opacity active:opacity-80"
+            style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
+          >
+            <IconPlus />
+            Añadir producto
+          </button>
+          <button
+            onClick={() => setShowAlbaranModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold transition-opacity active:opacity-80"
+            style={{ backgroundColor: '#FFFFFF', color: '#1B3A2A', border: '1.5px solid #1B3A2A', borderRadius: 12 }}
+          >
+            <IconCamera />
+            Subir albarán
+          </button>
+        </div>
       </div>
 
       {/* Banner pendiente */}
@@ -199,6 +228,45 @@ export default function MiCatalogoPage() {
       </div>
 
       <BottomNavProveedor />
+
+      {/* Modal albarán OCR */}
+      {showAlbaranModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center sm:items-center px-4 pb-6"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setShowAlbaranModal(false)}
+        >
+          <div
+            className="bg-white w-full max-w-sm px-6 pt-6 pb-8"
+            style={{ borderRadius: 20 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Subir albarán</h2>
+              <button
+                onClick={() => setShowAlbaranModal(false)}
+                className="w-8 h-8 flex items-center justify-center"
+                style={{ color: '#6B7280', backgroundColor: '#F0F5F1', borderRadius: 8 }}
+              >
+                <IconX />
+              </button>
+            </div>
+            <p className="text-sm mb-6" style={{ color: '#6B7280' }}>
+              Fotografía tu albarán y generaremos el stock automáticamente
+            </p>
+            <button
+              className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold"
+              style={{ backgroundColor: '#F0F5F1', color: '#1B3A2A', borderRadius: 12 }}
+            >
+              <IconCamera />
+              Seleccionar foto
+            </button>
+            <p className="text-center text-xs mt-4" style={{ color: '#9CA3AF' }}>
+              Próximamente disponible
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
