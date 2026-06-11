@@ -21,7 +21,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Frutas y verduras variadas, cítricos y tropicales',
     pabellon: '',
     numPuesto: '117 · 137',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_macias_vera.jpg',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_macias_vera2.jpg',
     disponibilidad: 'mañana',
   },
   {
@@ -30,7 +30,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Fruta de temporada nacional',
     pabellon: '',
     numPuesto: '113 · 114 · 115 · 116',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_martin_mariscal.jpg',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_martin_mariscal2.jpg',
     disponibilidad: 'mañana',
   },
   {
@@ -39,7 +39,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Verdura de hoja y hortalizas',
     pabellon: '',
     numPuesto: '111 · 131 · 132 · 133',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/gallegos_e_hijos.jpg',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/gallegos_e_hijos2.jpg',
     disponibilidad: 'mañana',
   },
   {
@@ -48,7 +48,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Patata, cebolla y tubérculos',
     pabellon: '',
     numPuesto: '105 · 106 · 107',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/importpatata.jpg',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/importpatata2.jpg',
     disponibilidad: 'mañana',
   },
   {
@@ -57,7 +57,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Plátano de Canarias y fruta tropical importada',
     pabellon: '',
     numPuesto: '139',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_del_pino.jpg',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_del_pino2.jpg',
     disponibilidad: 'pocas',
   },
   {
@@ -66,7 +66,7 @@ const PUESTOS: Puesto[] = [
     especialidad: 'Producto local Granada — verdura de la Vega',
     pabellon: '',
     numPuesto: '101 · 120 · 228-230',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/hortifrut_granada.jpg',
+    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/hortifrut_granada2.jpg',
     disponibilidad: 'mañana',
   },
 ]

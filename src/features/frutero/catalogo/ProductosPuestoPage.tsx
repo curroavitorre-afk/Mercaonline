@@ -16,7 +16,7 @@ const PUESTOS_DATA: Record<string, PuestoData> = {
     proveedor: {
       id: 'mock-p1', userId: 'mock-u1', nombre: 'Frutas Macías Vera',
       descripcion: 'Frutas y verduras variadas, cítricos y tropicales', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_macias_vera.jpg',
+      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_macias_vera2.jpg',
     },
     productos: [
       { id: 'mg-1-1', proveedorId: 'mock-p1', nombre: 'Naranjas Valencia', precio: 0.45, unidad: 'kg', stockDisponible: 500, activo: true },
@@ -30,7 +30,7 @@ const PUESTOS_DATA: Record<string, PuestoData> = {
     proveedor: {
       id: 'mock-p2', userId: 'mock-u2', nombre: 'Frutas Martín Mariscal',
       descripcion: 'Fruta de temporada nacional', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_martin_mariscal.jpg',
+      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_martin_mariscal2.jpg',
     },
     productos: [
       { id: 'mg-2-1', proveedorId: 'mock-p2', nombre: 'Fresas Huelva', precio: 1.20, unidad: 'kg', stockDisponible: 200, activo: true },
@@ -44,7 +44,7 @@ const PUESTOS_DATA: Record<string, PuestoData> = {
     proveedor: {
       id: 'mock-p3', userId: 'mock-u3', nombre: 'Hermanos Gallegos e Hijos',
       descripcion: 'Verdura de hoja y hortalizas', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/gallegos_e_hijos.jpg',
+      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/gallegos_e_hijos2.jpg',
     },
     productos: [
       { id: 'mg-3-1', proveedorId: 'mock-p3', nombre: 'Tomates rama', precio: 0.70, unidad: 'kg', stockDisponible: 600, activo: true },
@@ -58,7 +58,7 @@ const PUESTOS_DATA: Record<string, PuestoData> = {
     proveedor: {
       id: 'mock-p4', userId: 'mock-u4', nombre: 'Importpatata',
       descripcion: 'Patata, cebolla y tubérculos', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/importpatata.jpg',
+      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/importpatata2.jpg',
     },
     productos: [
       { id: 'mg-4-1', proveedorId: 'mock-p4', nombre: 'Patata blanca', precio: 0.35, unidad: 'kg', stockDisponible: 1000, activo: true },
@@ -72,7 +72,7 @@ const PUESTOS_DATA: Record<string, PuestoData> = {
     proveedor: {
       id: 'mock-p5', userId: 'mock-u5', nombre: 'Frutas del Pino',
       descripcion: 'Plátano de Canarias y fruta tropical importada', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_del_pino.jpg',
+      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_del_pino2.jpg',
     },
     productos: [
       { id: 'mg-5-1', proveedorId: 'mock-p5', nombre: 'Plátanos Canarias', precio: 0.85, unidad: 'kg', stockDisponible: 500, activo: true },
@@ -86,7 +86,7 @@ const PUESTOS_DATA: Record<string, PuestoData> = {
     proveedor: {
       id: 'mock-p6', userId: 'mock-u6', nombre: 'Hortifrut Granada',
       descripcion: 'Producto local Granada — verdura de la Vega', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/hortifrut_granada.jpg',
+      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/hortifrut_granada2.jpg',
     },
     productos: [
       { id: 'mg-6-1', proveedorId: 'mock-p6', nombre: 'Calabacín', precio: 0.45, unidad: 'kg', stockDisponible: 400, activo: true },
