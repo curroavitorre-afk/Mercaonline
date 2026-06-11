@@ -3,6 +3,7 @@ import { useAuthStore } from '@/lib/stores/auth'
 import { MOCK_PROVEEDORES, MOCK_PRODUCTOS } from '@/lib/mock-data'
 import type { Producto } from '@/lib/types'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 
 function IconPlus() {
   return (
@@ -86,6 +87,7 @@ function ProductoCard({ producto, onToggle }: ProductoCardProps) {
 
 export default function MiCatalogoPage() {
   const { user } = useAuthStore()
+  const bottomNavHeight = useBottomNavHeight()
   const miProveedor = MOCK_PROVEEDORES.find((p) => p.userId === user?.id) ?? MOCK_PROVEEDORES[0]
 
   const [productos, setProductos] = useState<Producto[]>(
@@ -110,7 +112,7 @@ export default function MiCatalogoPage() {
   const hayProductos = productos.length > 0
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
       {/* Cabecera */}
       <div className="px-4 pt-4 pb-5" style={{ backgroundColor: '#1B3A2A' }}>
         <div className="flex items-center justify-between">

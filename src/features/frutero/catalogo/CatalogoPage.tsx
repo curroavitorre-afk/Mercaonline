@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 
 interface Puesto {
   id: number
@@ -92,6 +93,7 @@ function IconLocation() {
 
 export default function CatalogoPage() {
   const navigate = useNavigate()
+  const bottomNavHeight = useBottomNavHeight()
   const [busqueda, setBusqueda] = useState('')
   const [filtroActivo, setFiltroActivo] = useState('Todos')
 
@@ -102,7 +104,7 @@ export default function CatalogoPage() {
   )
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
       {/* Cabecera */}
       <div className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
         <div className="flex items-center justify-between mb-3">

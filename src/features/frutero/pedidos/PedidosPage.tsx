@@ -4,6 +4,7 @@ import { MOCK_ORDERS, MOCK_PRODUCTOS, MOCK_PROVEEDORES } from '@/lib/mock-data'
 import { useCartStore } from '@/lib/stores/cart'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 import type { Order, OrderStatus } from '@/lib/types'
 
 // ─── Timeline ─────────────────────────────────────────────────────────────────
@@ -217,6 +218,7 @@ function ModalConflicto({ onSustituir, onAnadir, onCancelar }: ModalConflictoPro
 export default function PedidosPage() {
   const navigate = useNavigate()
   const { lineas, addLine, clear } = useCartStore()
+  const bottomNavHeight = useBottomNavHeight()
 
   const [pedidoConflicto, setPedidoConflicto] = useState<Order | null>(null)
   const [toastVisible, setToastVisible] = useState(false)
@@ -267,7 +269,7 @@ export default function PedidosPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
       {/* Toast */}
       {toastVisible && (
         <div

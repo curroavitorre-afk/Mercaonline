@@ -3,6 +3,7 @@ import { useAuthStore } from '@/lib/stores/auth'
 import { getOrdersDelDiaRepartidor, updateOrderStatus } from '@/lib/api'
 import type { Order, OrderStatus } from '@/lib/types'
 import BottomNavRepartidor from '@/components/BottomNavRepartidor'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 import {
   IS_UUID,
   MOCK_ORDERS_HOY,
@@ -44,6 +45,7 @@ function IconCamera() {
 
 export default function RutaPage() {
   const user = useAuthStore((s) => s.user)
+  const bottomNavHeight = useBottomNavHeight()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [recogidoHecho, setRecogidoHecho] = useState(false)
@@ -99,7 +101,7 @@ export default function RutaPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
+      <main className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
         <div className="px-5 pt-12 pb-6" style={{ backgroundColor: '#1B3A2A' }}>
           <div className="h-7 w-40 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
         </div>
@@ -112,7 +114,7 @@ export default function RutaPage() {
   }
 
   return (
-    <main className="min-h-screen pb-28" style={{ backgroundColor: '#F8F7F3' }}>
+    <main className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
       {/* Header */}
       <header className="px-5 pt-12 pb-6" style={{ backgroundColor: '#1B3A2A' }}>
         <div className="flex items-start justify-between gap-3">

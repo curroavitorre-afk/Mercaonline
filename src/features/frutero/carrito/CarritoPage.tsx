@@ -4,6 +4,7 @@ import { useCartStore } from '@/lib/stores/cart'
 import { useAuthStore } from '@/lib/stores/auth'
 import { createOrder } from '@/lib/api'
 import { sendOrderConfirmation } from '@/lib/notifications'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 import type { SubtotalPorProveedor } from '@/lib/types'
 import BottomNav from '@/components/BottomNav'
 
@@ -41,6 +42,14 @@ function IconBox() {
       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
       <polyline points="3.27,6.96 12,12.01 20.73,6.96" />
       <line x1="12" y1="22.08" x2="12" y2="12" />
+    </svg>
+  )
+}
+
+function IconBack() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15,18 9,12 15,6" />
     </svg>
   )
 }
@@ -219,8 +228,10 @@ function PantallaConfirmacion({ grupos, tarifa, total }: ConfirmacionProps) {
 // ─── Carrito principal ────────────────────────────────────────────────────────
 
 export default function CarritoPage() {
+  const navigate = useNavigate()
   const { lineas, updateCantidad, removeLine, getSubtotalPorProveedor, getSubtotalBruto, getTarifaServicio, getTotal, clear } = useCartStore()
   const { user } = useAuthStore()
+  const bottomNavHeight = useBottomNavHeight()
 
   const [modalVisible, setModalVisible] = useState(false)
   const [confirmado, setConfirmado] = useState(false)
@@ -260,13 +271,28 @@ export default function CarritoPage() {
   }
 
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: '#F8F7F3' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
       {/* Cabecera */}
       <div className="bg-white px-4 pt-4 pb-4" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
-        <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Tu pedido</h1>
-        <p className="text-sm mt-0.5" style={{ color: '#6B7280' }}>
-          Varios puestos — una sola entrega
-        </p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-9 h-9 shrink-0"
+            style={{ color: '#222222', backgroundColor: '#F0F5F1', borderRadius: 10 }}
+          >
+            <IconBack />
+          </button>
+          <div className="flex-1 min-w-0">
+            <button
+              onClick={() => navigate('/app/frutero')}
+              className="text-[11px] font-semibold block"
+              style={{ color: '#1B3A2A' }}
+            >
+              MercaOnline
+            </button>
+            <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Tu pedido</h1>
+          </div>
+        </div>
       </div>
 
       {hayLineas ? (

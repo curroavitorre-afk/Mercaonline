@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { MOCK_PROVEEDORES } from '@/lib/mock-data'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 
 interface MensajeMock {
   proveedorId: string
@@ -42,6 +43,7 @@ function IconSearch() {
 }
 
 export default function ChatPage() {
+  const bottomNavHeight = useBottomNavHeight()
   const [busqueda, setBusqueda] = useState('')
 
   const conversaciones = MOCK_PROVEEDORES.filter((p) =>
@@ -49,7 +51,7 @@ export default function ChatPage() {
   )
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
       {/* Cabecera */}
       <div className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
         <div className="flex items-center justify-between mb-3">

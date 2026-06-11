@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/lib/stores/auth'
 import { MOCK_PROVEEDORES } from '@/lib/mock-data'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 
 type EstadoPedidoProveedor = 'pendiente' | 'confirmado' | 'recogido'
 
@@ -74,6 +75,7 @@ function IconClock() {
 
 export default function PedidosProveedorPage() {
   const { user } = useAuthStore()
+  const bottomNavHeight = useBottomNavHeight()
   const miProveedor = MOCK_PROVEEDORES.find((p) => p.userId === user?.id) ?? MOCK_PROVEEDORES[0]
 
   if (!miProveedor) {
@@ -85,7 +87,7 @@ export default function PedidosProveedorPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
       {/* Cabecera */}
       <div className="bg-white px-4 pt-4 pb-4" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
         <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Pedidos recibidos</h1>

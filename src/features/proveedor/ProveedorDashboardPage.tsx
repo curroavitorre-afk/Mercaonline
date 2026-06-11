@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
 import { MOCK_PROVEEDORES, MOCK_PRODUCTOS } from '@/lib/mock-data'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 
 function IconTag() {
   return (
@@ -41,6 +42,7 @@ function IconChevron() {
 export default function ProveedorDashboardPage() {
   const { user } = useAuthStore()
   const navigate = useNavigate()
+  const bottomNavHeight = useBottomNavHeight()
 
   const miProveedor = MOCK_PROVEEDORES.find((p) => p.userId === user?.id) ?? MOCK_PROVEEDORES[0]
 
@@ -63,7 +65,7 @@ export default function ProveedorDashboardPage() {
     .toUpperCase()
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
       {/* Cabecera verde */}
       <div className="px-4 pt-12 pb-8 text-white" style={{ backgroundColor: '#1B3A2A' }}>
         <div className="flex items-center gap-4 mb-6">

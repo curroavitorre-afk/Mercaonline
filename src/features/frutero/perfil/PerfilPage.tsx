@@ -2,6 +2,7 @@ import { useAuthStore } from '@/lib/stores/auth'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
 import { useNavigate } from 'react-router-dom'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 
 function IconPhone() {
   return (
@@ -79,6 +80,7 @@ function InfoCard({ icon, label, value }: InfoCardProps) {
 export default function PerfilPage() {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+  const bottomNavHeight = useBottomNavHeight()
 
   function handleLogout() {
     logout()
@@ -93,7 +95,7 @@ export default function PerfilPage() {
     .toUpperCase() ?? 'MO'
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: '80px' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3', paddingBottom: bottomNavHeight }}>
       {/* Cabecera con fondo verde bosque */}
       <div
         className="px-4 pt-12 pb-8 text-white relative"

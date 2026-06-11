@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCartStore } from '@/lib/stores/cart'
+import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
 import type { Producto, Proveedor } from '@/lib/types'
 
 // ─── Datos mock por puesto ────────────────────────────────────────────────────
@@ -125,6 +126,7 @@ export default function ProductosPuestoPage() {
   const { proveedorId } = useParams<{ proveedorId: string }>()
   const navigate = useNavigate()
   const { addLine, getTotalLineas } = useCartStore()
+  const bottomNavHeight = useBottomNavHeight()
 
   const puestoData = proveedorId ? PUESTOS_DATA[proveedorId] : undefined
   const totalLineas = getTotalLineas()
@@ -171,7 +173,7 @@ export default function ProductosPuestoPage() {
   return (
     <div
       className="min-h-screen"
-      style={{ backgroundColor: '#F8F7F3', paddingBottom: totalLineas > 0 ? 160 : 80 }}
+      style={{ backgroundColor: '#F8F7F3', paddingBottom: totalLineas > 0 ? bottomNavHeight + 80 : bottomNavHeight }}
     >
       {/* Toast */}
       {toastProducto && (
@@ -195,11 +197,18 @@ export default function ProductosPuestoPage() {
           <button
             onClick={() => navigate(-1)}
             className="flex items-center justify-center w-9 h-9 shrink-0"
-            style={{ color: '#1B3A2A', backgroundColor: '#F0F5F1', borderRadius: 10 }}
+            style={{ color: '#222222', backgroundColor: '#F0F5F1', borderRadius: 10 }}
           >
             <IconBack />
           </button>
           <div className="flex-1 min-w-0">
+            <button
+              onClick={() => navigate('/app/frutero')}
+              className="text-[11px] font-semibold block"
+              style={{ color: '#1B3A2A' }}
+            >
+              MercaOnline
+            </button>
             <h1 className="text-lg font-bold font-serif truncate" style={{ color: '#222222' }}>
               {proveedor.nombre}
             </h1>
