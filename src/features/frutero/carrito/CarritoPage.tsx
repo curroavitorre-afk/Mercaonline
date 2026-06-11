@@ -6,6 +6,7 @@ import { useCartStore } from '@/lib/stores/cart'
 import { useAuthStore } from '@/lib/stores/auth'
 import { createOrder } from '@/lib/api'
 import { stripePromise, simulateCharge } from '@/lib/stripe'
+import { sendOrderConfirmation } from '@/lib/notifications'
 import type { SubtotalPorProveedor } from '@/lib/types'
 import BottomNav from '@/components/BottomNav'
 
@@ -284,7 +285,7 @@ export default function CarritoPage() {
     const totalFinal = getTotal()
     const todasLineas = grupos.flatMap((g) => g.lineas)
 
-    await createOrder({
+    const order = await createOrder({
       fruteroId: user!.id,
       estado: 'confirmado',
       lineas: todasLineas,
@@ -292,6 +293,8 @@ export default function CarritoPage() {
       total: totalFinal,
       fechaEntregaEstimada: new Date(Date.now() + 86_400_000).toISOString(),
     })
+
+    sendOrderConfirmation(user!.telefono, { id: order.id, total: totalFinal }).catch(console.error)
 
     setResumen({ grupos, tarifa, total: totalFinal })
     clear()
