@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MOCK_ORDERS, MOCK_PRODUCTOS, MOCK_PROVEEDORES } from '@/lib/mock-data'
 import { useCartStore } from '@/lib/stores/cart'
+import { useFase } from '@/lib/hooks/useFase'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
 import type { Order, OrderStatus } from '@/lib/types'
@@ -130,6 +131,22 @@ const ESTADO_LABEL: Record<OrderStatus, string> = {
   incidencia: 'Incidencia',
 }
 
+function BadgeFase0({ estado }: { estado: OrderStatus }) {
+  const preparado = estado === 'recogido' || estado === 'en_reparto' || estado === 'entregado'
+  return (
+    <span
+      className="text-[11px] font-semibold px-2.5 py-1"
+      style={{
+        backgroundColor: preparado ? '#DCFCE7' : '#FEF3C7',
+        color: preparado ? '#166534' : '#92400E',
+        borderRadius: 20,
+      }}
+    >
+      {preparado ? 'Preparado' : 'Pendiente'}
+    </span>
+  )
+}
+
 function BadgeEstado({ estado }: { estado: OrderStatus }) {
   const styles: Record<OrderStatus, { bg: string; color: string }> = {
     confirmado: { bg: '#EEF2FF', color: '#4338CA' },
@@ -217,6 +234,7 @@ function ModalConflicto({ onSustituir, onAnadir, onCancelar }: ModalConflictoPro
 export default function PedidosPage() {
   const navigate = useNavigate()
   const { lineas, addLine, clear } = useCartStore()
+  const { fase } = useFase()
 
   const [pedidoConflicto, setPedidoConflicto] = useState<Order | null>(null)
   const [toastVisible, setToastVisible] = useState(false)
@@ -329,13 +347,19 @@ export default function PedidosPage() {
                       {pedido.lineas.length} {pedido.lineas.length === 1 ? 'artículo' : 'artículos'} · {pedido.total.toFixed(2)} €
                     </p>
                   </div>
-                  <BadgeEstado estado={pedido.estado} />
+                  {fase === 'fase0' ? (
+                    <BadgeFase0 estado={pedido.estado} />
+                  ) : (
+                    <BadgeEstado estado={pedido.estado} />
+                  )}
                 </div>
 
-                {/* Timeline de estado */}
-                <div className="px-4 pb-3" style={{ borderTop: '1px solid #F3F4F6', paddingTop: 16 }}>
-                  <TimelineEstado estado={pedido.estado} />
-                </div>
+                {/* Estado */}
+                {fase !== 'fase0' && (
+                  <div className="px-4 pb-3" style={{ borderTop: '1px solid #F3F4F6', paddingTop: 16 }}>
+                    <TimelineEstado estado={pedido.estado} />
+                  </div>
+                )}
 
                 {/* Detalle de líneas */}
                 <div className="px-4 pb-3" style={{ borderTop: '1px solid #F3F4F6', paddingTop: 12 }}>

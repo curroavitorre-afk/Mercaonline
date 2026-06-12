@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
 import { getOrdersDelDiaRepartidor, updateOrderStatus } from '@/lib/api'
+import { useFase } from '@/lib/hooks/useFase'
 import type { Order, OrderStatus } from '@/lib/types'
 import BottomNavRepartidor from '@/components/BottomNavRepartidor'
 import {
@@ -46,6 +47,7 @@ function IconCamera() {
 export default function RutaPage() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
+  const { fase, loading: faseLoading } = useFase()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [recogidoHecho, setRecogidoHecho] = useState(false)
@@ -99,7 +101,7 @@ export default function RutaPage() {
 
   const totalParadas = orders.length > 0 ? 1 + orders.length : 0
 
-  if (loading) {
+  if (loading || faseLoading) {
     return (
       <main className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
         <div className="px-5 pt-12 pb-6" style={{ backgroundColor: '#1B3A2A' }}>
@@ -107,6 +109,28 @@ export default function RutaPage() {
         </div>
         <div className="px-4 py-8 text-center">
           <p className="text-sm" style={{ color: '#9CA3AF' }}>Cargando ruta…</p>
+        </div>
+        <BottomNavRepartidor />
+      </main>
+    )
+  }
+
+  if (fase === 'fase0') {
+    return (
+      <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#F8F7F3' }}>
+        <header className="px-5 pt-12 pb-6" style={{ backgroundColor: '#1B3A2A' }}>
+          <button onClick={() => navigate('/')} className="block mb-3 text-left">
+            <span className="text-[11px] font-bold" style={{ color: '#FFFFFF', fontFamily: 'Fraunces, serif', letterSpacing: '0.03em' }}>MercaOnline</span>
+            <span className="text-[9px] block mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Inicio</span>
+          </button>
+          <h1 className="text-2xl font-bold text-white leading-tight" style={{ fontFamily: 'Fraunces, serif' }}>
+            Mi ruta de hoy
+          </h1>
+        </header>
+        <div className="flex-1 flex items-center justify-center px-6 text-center">
+          <p className="text-sm leading-relaxed" style={{ color: '#6B7280' }}>
+            El servicio de reparto no está activo. Estás en Fase 0 — pedido preparado para recoger en el puesto.
+          </p>
         </div>
         <BottomNavRepartidor />
       </main>

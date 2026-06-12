@@ -352,6 +352,39 @@ export async function getAllOrdersToday(): Promise<Order[]> {
   return (data as OrderRow[]).map(toOrder)
 }
 
+export async function getAllOrdersSemana(): Promise<Order[]> {
+  const inicio = new Date()
+  inicio.setDate(inicio.getDate() - 7)
+  inicio.setHours(0, 0, 0, 0)
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, order_lines(*)')
+    .gte('created_at', inicio.toISOString())
+    .order('created_at', { ascending: false })
+  if (error) throw new Error(error.message)
+  return (data as OrderRow[]).map(toOrder)
+}
+
+export async function getAllProveedores(): Promise<Proveedor[]> {
+  const { data, error } = await supabase
+    .from('proveedores')
+    .select('*')
+    .eq('activo', true)
+    .order('nombre')
+  if (error) throw new Error(error.message)
+  return (data as ProveedorRow[]).map(toProveedor)
+}
+
+export async function getFruteros(): Promise<User[]> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('role', 'frutero')
+    .order('nombre')
+  if (error) throw new Error(error.message)
+  return (data as ProfileRow[]).map(toUser)
+}
+
 // ─── Repartidor ───────────────────────────────────────────────────────────────
 
 export async function getOrdersDelDiaRepartidor(repartidorId: string): Promise<Order[]> {

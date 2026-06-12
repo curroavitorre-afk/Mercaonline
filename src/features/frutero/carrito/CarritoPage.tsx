@@ -4,6 +4,7 @@ import { useCartStore } from '@/lib/stores/cart'
 import { useAuthStore } from '@/lib/stores/auth'
 import { createOrder } from '@/lib/api'
 import { sendOrderConfirmation } from '@/lib/notifications'
+import { useFase } from '@/lib/hooks/useFase'
 import type { SubtotalPorProveedor } from '@/lib/types'
 import BottomNav from '@/components/BottomNav'
 
@@ -142,9 +143,10 @@ interface ConfirmacionProps {
   grupos: SubtotalPorProveedor[]
   tarifa: number
   total: number
+  fase: 'fase0' | 'fase2'
 }
 
-function PantallaConfirmacion({ grupos, tarifa, total }: ConfirmacionProps) {
+function PantallaConfirmacion({ grupos, tarifa, total, fase }: ConfirmacionProps) {
   const navigate = useNavigate()
 
   return (
@@ -157,10 +159,12 @@ function PantallaConfirmacion({ grupos, tarifa, total }: ConfirmacionProps) {
           <IconCheck />
         </div>
         <h1 className="text-2xl font-bold font-serif text-white mb-2">
-          Pedido confirmado
+          {fase === 'fase0' ? '¡Pedido confirmado!' : 'Pedido confirmado'}
         </h1>
         <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
-          Tu genero llegara antes de las 7AM
+          {fase === 'fase0'
+            ? 'Recógelo en cada puesto desde las 4AM. Lleva esta confirmación.'
+            : 'Tu genero llegara antes de las 7AM'}
         </p>
       </div>
 
@@ -195,17 +199,21 @@ function PantallaConfirmacion({ grupos, tarifa, total }: ConfirmacionProps) {
           className="bg-white px-4 py-4 space-y-2"
           style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
         >
-          <div className="flex justify-between">
-            <span className="text-sm" style={{ color: '#6B7280' }}>Envio</span>
-            <span className="text-sm" style={{ color: '#222222' }}>{tarifa.toFixed(2)} €</span>
-          </div>
-          <div className="h-px" style={{ backgroundColor: '#E5E7EB' }} />
+          {fase === 'fase2' && (
+            <>
+              <div className="flex justify-between">
+                <span className="text-sm" style={{ color: '#6B7280' }}>Envio</span>
+                <span className="text-sm" style={{ color: '#222222' }}>{tarifa.toFixed(2)} €</span>
+              </div>
+              <div className="h-px" style={{ backgroundColor: '#E5E7EB' }} />
+            </>
+          )}
           <div className="flex justify-between items-center">
             <span className="text-lg font-bold font-serif" style={{ color: '#222222' }}>
-              Total pagado
+              {fase === 'fase0' ? 'Total productos' : 'Total pagado'}
             </span>
             <span className="text-xl font-bold font-serif" style={{ color: '#1B3A2A' }}>
-              {total.toFixed(2)} €
+              {(fase === 'fase0' ? total - tarifa : total).toFixed(2)} €
             </span>
           </div>
         </div>
@@ -215,7 +223,7 @@ function PantallaConfirmacion({ grupos, tarifa, total }: ConfirmacionProps) {
           className="w-full py-4 text-white font-semibold text-base"
           style={{ backgroundColor: '#1B3A2A', borderRadius: 12 }}
         >
-          Ver seguimiento
+          {fase === 'fase0' ? 'Ver mis pedidos' : 'Ver seguimiento'}
         </button>
       </div>
 
@@ -230,10 +238,12 @@ export default function CarritoPage() {
   const navigate = useNavigate()
   const { lineas, updateCantidad, removeLine, getSubtotalPorProveedor, getSubtotalBruto, getTarifaServicio, getTotal, clear } = useCartStore()
   const { user } = useAuthStore()
+  const { fase, loading: faseLoading } = useFase()
 
   const [modalVisible, setModalVisible] = useState(false)
   const [confirmado, setConfirmado] = useState(false)
   const [resumen, setResumen] = useState<ConfirmacionProps | null>(null)
+  const [cargandoFase0, setCargandoFase0] = useState(false)
 
   const subtotalesPorProveedor = getSubtotalPorProveedor()
   const subtotalBruto = getSubtotalBruto()
@@ -241,7 +251,7 @@ export default function CarritoPage() {
   const total = getTotal()
   const hayLineas = lineas.length > 0
 
-  const handlePagoExitoso = async () => {
+  const crearPedido = async () => {
     const grupos = getSubtotalPorProveedor()
     const tarifa = getTarifaServicio()
     const totalFinal = getTotal()
@@ -258,10 +268,27 @@ export default function CarritoPage() {
 
     sendOrderConfirmation(user!.telefono, { id: order.id, total: totalFinal }).catch(console.error)
 
-    setResumen({ grupos, tarifa, total: totalFinal })
+    return { grupos, tarifa, totalFinal }
+  }
+
+  const handlePagoExitoso = async () => {
+    const { grupos, tarifa, totalFinal } = await crearPedido()
+    setResumen({ grupos, tarifa, total: totalFinal, fase: 'fase2' })
     clear()
     setModalVisible(false)
     setConfirmado(true)
+  }
+
+  const handleConfirmarFase0 = async () => {
+    setCargandoFase0(true)
+    try {
+      const { grupos, tarifa, totalFinal } = await crearPedido()
+      setResumen({ grupos, tarifa, total: totalFinal, fase: 'fase0' })
+      clear()
+      setConfirmado(true)
+    } finally {
+      setCargandoFase0(false)
+    }
   }
 
   if (confirmado && resumen) {
@@ -366,30 +393,60 @@ export default function CarritoPage() {
               <span className="text-sm" style={{ color: '#6B7280' }}>Subtotal</span>
               <span className="text-sm" style={{ color: '#222222' }}>{subtotalBruto.toFixed(2)} €</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm" style={{ color: '#6B7280' }}>Envio</span>
-              <span className="text-sm" style={{ color: '#222222' }}>{tarifaServicio.toFixed(2)} €</span>
-            </div>
+            {fase !== 'fase0' && (
+              <div className="flex justify-between">
+                <span className="text-sm" style={{ color: '#6B7280' }}>Tarifa de servicio</span>
+                <span className="text-sm" style={{ color: '#222222' }}>{tarifaServicio.toFixed(2)} €</span>
+              </div>
+            )}
             <div className="h-px" style={{ backgroundColor: '#E5E7EB' }} />
             <div className="flex justify-between items-center">
               <span className="text-lg font-bold font-serif" style={{ color: '#222222' }}>Total</span>
-              <span className="text-xl font-bold font-serif" style={{ color: '#1B3A2A' }}>{total.toFixed(2)} €</span>
+              <span className="text-xl font-bold font-serif" style={{ color: '#1B3A2A' }}>
+                {(fase === 'fase0' ? subtotalBruto : total).toFixed(2)} €
+              </span>
             </div>
           </div>
 
-          {/* Botón de pago */}
-          <button
-            className="w-full text-white font-semibold py-4 text-base transition-colors"
-            style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
-            onClick={() => setModalVisible(true)}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#D97A1E')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#F28C28')}
-          >
-            Pagar y confirmar pedido
-          </button>
-          <p className="text-center text-xs" style={{ color: '#6B7280' }}>
-            Entrega antes de las 7:00 · Sin permanencia
-          </p>
+          {/* Botón de acción */}
+          {fase === 'fase0' ? (
+            <>
+              <button
+                className="w-full text-white font-semibold py-4 text-base transition-colors"
+                style={{ backgroundColor: '#F28C28', borderRadius: 12, opacity: cargandoFase0 || faseLoading ? 0.85 : 1 }}
+                onClick={handleConfirmarFase0}
+                disabled={cargandoFase0 || faseLoading}
+              >
+                {cargandoFase0 ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="9" stroke="white" strokeOpacity="0.3" strokeWidth="2.5" />
+                      <path d="M12 3a9 9 0 0 1 9 9" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                    </svg>
+                    Confirmando...
+                  </span>
+                ) : 'Confirmar pedido para recoger'}
+              </button>
+              <p className="text-center text-xs" style={{ color: '#6B7280' }}>
+                Recogida en el puesto desde las 4:00
+              </p>
+            </>
+          ) : (
+            <>
+              <button
+                className="w-full text-white font-semibold py-4 text-base transition-colors"
+                style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
+                onClick={() => setModalVisible(true)}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#D97A1E')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#F28C28')}
+              >
+                Pagar y confirmar pedido
+              </button>
+              <p className="text-center text-xs" style={{ color: '#6B7280' }}>
+                Entrega antes de las 7:00 · Sin permanencia
+              </p>
+            </>
+          )}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
