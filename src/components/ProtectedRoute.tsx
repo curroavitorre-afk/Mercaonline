@@ -13,7 +13,8 @@ export default function ProtectedRoute({ children, roles }: Props) {
   const location = useLocation()
 
   if (!isAuthenticated || !user) {
-    return <Navigate to="/login" state={{ from: location }} replace />
+    const adminOnly = roles?.length === 1 && roles[0] === 'admin'
+    return <Navigate to={adminOnly ? '/admin-acceso' : '/login'} state={{ from: location }} replace />
   }
 
   if (roles && !roles.includes(user.role)) {

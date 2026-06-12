@@ -14,6 +14,7 @@ import MiCatalogoPage from '@/features/proveedor/catalogo/MiCatalogoPage'
 import PedidosProveedorPage from '@/features/proveedor/pedidos/PedidosProveedorPage'
 import PerfilProveedorPage from '@/features/proveedor/perfil/PerfilProveedorPage'
 import AdminPage from '@/features/admin/AdminPage'
+import AdminLoginPage from '@/features/admin/AdminLoginPage'
 import RutaPage from '@/features/repartidor/RutaPage'
 import EstadoPage from '@/features/repartidor/EstadoPage'
 import ProtectedRoute from '@/components/ProtectedRoute'
@@ -117,7 +118,11 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // ─── Admin (protegida) ───────────────────────────────────────────────────
+  // ─── Admin ───────────────────────────────────────────────────────────────
+  {
+    path: '/admin-acceso',
+    element: <AdminLoginPage />,
+  },
   {
     path: '/app/admin',
     element: (
