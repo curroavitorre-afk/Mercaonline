@@ -13,6 +13,7 @@ import ProveedorDashboardPage from '@/features/proveedor/ProveedorDashboardPage'
 import MiCatalogoPage from '@/features/proveedor/catalogo/MiCatalogoPage'
 import PedidosProveedorPage from '@/features/proveedor/pedidos/PedidosProveedorPage'
 import PerfilProveedorPage from '@/features/proveedor/perfil/PerfilProveedorPage'
+import ChatProveedorPage from '@/features/proveedor/chat/ChatProveedorPage'
 import AdminPage from '@/features/admin/AdminPage'
 import AdminLoginPage from '@/features/admin/AdminLoginPage'
 import RutaPage from '@/features/repartidor/RutaPage'
@@ -106,6 +107,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={['proveedor']}>
         <PedidosProveedorPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/app/proveedor/chat',
+    element: (
+      <ProtectedRoute roles={['proveedor']}>
+        <ChatProveedorPage />
       </ProtectedRoute>
     ),
   },

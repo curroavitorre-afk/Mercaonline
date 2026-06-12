@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { User, Proveedor, Producto, Order, OrderLine, OrderStatus, Role, Unidad, EstadoAprobacion } from './types'
+import type { User, Proveedor, Producto, Order, OrderLine, OrderStatus, Role, Unidad, EstadoAprobacion, RoleMensaje, Conversacion, Mensaje, ConversacionResumen } from './types'
 
 // ─── Row types (espejo del schema SQL) ───────────────────────────────────────
 
@@ -43,6 +43,33 @@ interface OrderLineRow {
   cantidad: number
   precio_unitario: number
   subtotal: number
+}
+
+interface ConversacionRow {
+  id: string
+  frutero_id: string
+  proveedor_id: string
+  created_at: string
+}
+
+interface MensajeRow {
+  id: string
+  conversacion_id: string
+  remitente_id: string
+  remitente_role: string
+  contenido: string
+  leido: boolean
+  created_at: string
+}
+
+interface ConversacionConProveedorRow extends ConversacionRow {
+  proveedores: { nombre: string } | null
+  mensajes: Array<{ contenido: string; created_at: string; remitente_role: string; leido: boolean }>
+}
+
+interface ConversacionConFruteroRow extends ConversacionRow {
+  profiles: { nombre: string } | null
+  mensajes: Array<{ contenido: string; created_at: string; remitente_role: string; leido: boolean }>
 }
 
 interface OrderRow {
@@ -99,6 +126,23 @@ const toOrderLine = (r: OrderLineRow): OrderLine => ({
   cantidad: r.cantidad,
   precioUnitario: r.precio_unitario,
   subtotal: r.subtotal,
+})
+
+const toConversacion = (r: ConversacionRow): Conversacion => ({
+  id: r.id,
+  fruteroId: r.frutero_id,
+  proveedorId: r.proveedor_id,
+  createdAt: r.created_at,
+})
+
+const toMensaje = (r: MensajeRow): Mensaje => ({
+  id: r.id,
+  conversacionId: r.conversacion_id,
+  remitenteId: r.remitente_id,
+  remitenteRole: r.remitente_role as RoleMensaje,
+  contenido: r.contenido,
+  leido: r.leido,
+  createdAt: r.created_at,
 })
 
 const toOrder = (r: OrderRow): Order => ({
@@ -383,6 +427,111 @@ export async function getFruteros(): Promise<User[]> {
     .order('nombre')
   if (error) throw new Error(error.message)
   return (data as ProfileRow[]).map(toUser)
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+
+export async function getOrCreateConversacion(fruteroId: string, proveedorId: string): Promise<Conversacion> {
+  const { data: existing } = await supabase
+    .from('conversaciones')
+    .select('*')
+    .eq('frutero_id', fruteroId)
+    .eq('proveedor_id', proveedorId)
+    .maybeSingle()
+
+  if (existing) return toConversacion(existing as ConversacionRow)
+
+  const { data, error } = await supabase
+    .from('conversaciones')
+    .insert({ frutero_id: fruteroId, proveedor_id: proveedorId })
+    .select()
+    .single()
+
+  if (error || !data) throw new Error(error?.message ?? 'Error al crear conversación')
+  return toConversacion(data as ConversacionRow)
+}
+
+export async function getMensajes(conversacionId: string): Promise<Mensaje[]> {
+  const { data, error } = await supabase
+    .from('mensajes')
+    .select('*')
+    .eq('conversacion_id', conversacionId)
+    .order('created_at', { ascending: true })
+
+  if (error) throw new Error(error.message)
+  return (data as MensajeRow[]).map(toMensaje)
+}
+
+export async function enviarMensaje(
+  conversacionId: string,
+  remitenteId: string,
+  remitenteRole: RoleMensaje,
+  contenido: string,
+): Promise<Mensaje> {
+  const { data, error } = await supabase
+    .from('mensajes')
+    .insert({ conversacion_id: conversacionId, remitente_id: remitenteId, remitente_role: remitenteRole, contenido })
+    .select()
+    .single()
+
+  if (error || !data) throw new Error(error?.message ?? 'Error al enviar mensaje')
+  return toMensaje(data as MensajeRow)
+}
+
+function buildResumen(
+  row: ConversacionConProveedorRow | ConversacionConFruteroRow,
+  otroNombre: string,
+  miRole: RoleMensaje,
+): ConversacionResumen {
+  const msgs = [...row.mensajes].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+  )
+  const last = msgs[msgs.length - 1]
+  return {
+    id: row.id,
+    fruteroId: row.frutero_id,
+    proveedorId: row.proveedor_id,
+    createdAt: row.created_at,
+    otroNombre,
+    ultimoMensaje: last
+      ? { contenido: last.contenido, createdAt: last.created_at, remitenteRole: last.remitente_role as RoleMensaje }
+      : null,
+    hayNoLeidos: msgs.some((m) => !m.leido && m.remitente_role !== miRole),
+  }
+}
+
+export async function getConversacionesDeFrutero(fruteroId: string): Promise<ConversacionResumen[]> {
+  const { data, error } = await supabase
+    .from('conversaciones')
+    .select('*, proveedores(nombre), mensajes(contenido, created_at, remitente_role, leido)')
+    .eq('frutero_id', fruteroId)
+
+  if (error) throw new Error(error.message)
+
+  return (data as ConversacionConProveedorRow[])
+    .map((row) => buildResumen(row, row.proveedores?.nombre ?? 'Puesto', 'frutero'))
+    .sort((a, b) => {
+      const ta = a.ultimoMensaje?.createdAt ?? a.createdAt
+      const tb = b.ultimoMensaje?.createdAt ?? b.createdAt
+      return new Date(tb).getTime() - new Date(ta).getTime()
+    })
+}
+
+export async function getConversacionesDeProveedor(proveedorId: string): Promise<ConversacionResumen[]> {
+  const { data, error } = await supabase
+    .from('conversaciones')
+    .select('*, profiles(nombre), mensajes(contenido, created_at, remitente_role, leido)')
+    .eq('proveedor_id', proveedorId)
+
+  if (error) throw new Error(error.message)
+
+  return (data as ConversacionConFruteroRow[])
+    .map((row) => buildResumen(row, row.profiles?.nombre ?? 'Frutero', 'proveedor'))
+    .sort((a, b) => {
+      const ta = a.ultimoMensaje?.createdAt ?? a.createdAt
+      const tb = b.ultimoMensaje?.createdAt ?? b.createdAt
+      return new Date(tb).getTime() - new Date(ta).getTime()
+    })
 }
 
 // ─── Repartidor ───────────────────────────────────────────────────────────────

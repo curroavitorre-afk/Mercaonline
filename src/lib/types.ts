@@ -95,3 +95,38 @@ export interface SubtotalPorProveedor {
   subtotal: number
   lineas: OrderLine[]
 }
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+
+export type RoleMensaje = 'frutero' | 'proveedor' | 'sistema'
+
+export interface Conversacion {
+  id: string
+  fruteroId: string
+  proveedorId: string
+  createdAt: string
+}
+
+export interface Mensaje {
+  id: string
+  conversacionId: string
+  remitenteId: string
+  remitenteRole: RoleMensaje
+  contenido: string
+  leido: boolean
+  createdAt: string
+}
+
+export interface ConversacionResumen {
+  id: string
+  fruteroId: string
+  proveedorId: string
+  createdAt: string
+  otroNombre: string
+  ultimoMensaje: {
+    contenido: string
+    createdAt: string
+    remitenteRole: RoleMensaje
+  } | null
+  hayNoLeidos: boolean
+}

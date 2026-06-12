@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { RefObject } from 'react'
 import { useAuthStore } from '@/lib/stores/auth'
-import { getConversacionesDeFrutero, getMensajes, enviarMensaje } from '@/lib/api'
+import { getProveedorByUserId, getConversacionesDeProveedor, getMensajes, enviarMensaje } from '@/lib/api'
 import { supabase } from '@/lib/supabase'
 import type { Mensaje, ConversacionResumen, RoleMensaje } from '@/lib/types'
-import BottomNav from '@/components/BottomNav'
-import CartIcon from '@/components/CartIcon'
+import BottomNavProveedor from '@/components/BottomNavProveedor'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -167,7 +166,7 @@ function VistaChat({ conv, mensajes, cargando, texto, enviando, onVolver, onText
           <p className="text-sm font-semibold truncate" style={{ color: '#222222' }}>
             {conv.otroNombre}
           </p>
-          <p className="text-xs" style={{ color: '#9CA3AF' }}>Puesto del mercado</p>
+          <p className="text-xs" style={{ color: '#9CA3AF' }}>Fruteria</p>
         </div>
       </div>
 
@@ -180,12 +179,12 @@ function VistaChat({ conv, mensajes, cargando, texto, enviando, onVolver, onText
         ) : mensajes.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-sm" style={{ color: '#9CA3AF' }}>
-              Inicia la conversación
+              Aun no hay mensajes
             </p>
           </div>
         ) : (
           mensajes.map((m) => (
-            <BurbujaMensaje key={m.id} mensaje={m} miRole="frutero" />
+            <BurbujaMensaje key={m.id} mensaje={m} miRole="proveedor" />
           ))
         )}
         <div ref={bottomRef} />
@@ -236,8 +235,9 @@ function VistaChat({ conv, mensajes, cargando, texto, enviando, onVolver, onText
 
 // ─── Página principal ─────────────────────────────────────────────────────────
 
-export default function ChatPage() {
+export default function ChatProveedorPage() {
   const { user } = useAuthStore()
+  const [proveedorId, setProveedorId] = useState<string | null>(null)
   const [conversaciones, setConversaciones] = useState<ConversacionResumen[]>([])
   const [conversacionActiva, setConversacionActiva] = useState<ConversacionResumen | null>(null)
   const [mensajes, setMensajes] = useState<Mensaje[]>([])
@@ -248,28 +248,36 @@ export default function ChatPage() {
   const [enviando, setEnviando] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  const cargarConversaciones = useCallback(async () => {
+  // Obtiene el proveedorId del usuario actual
+  useEffect(() => {
     if (!user) return
+    getProveedorByUserId(user.id)
+      .then((p) => { if (p) setProveedorId(p.id) })
+      .catch(console.error)
+  }, [user])
+
+  const cargarConversaciones = useCallback(async () => {
+    if (!proveedorId) return
     try {
-      const data = await getConversacionesDeFrutero(user.id)
+      const data = await getConversacionesDeProveedor(proveedorId)
       setConversaciones(data)
     } catch (e) {
       console.error(e)
     } finally {
       setCargandoLista(false)
     }
-  }, [user])
+  }, [proveedorId])
 
   useEffect(() => {
-    cargarConversaciones()
-  }, [cargarConversaciones])
+    if (proveedorId) cargarConversaciones()
+  }, [proveedorId, cargarConversaciones])
 
   // Suscripción realtime cuando hay conversación abierta
   useEffect(() => {
     if (!conversacionActiva) return
 
     const channel = supabase
-      .channel(`chat-frutero:${conversacionActiva.id}`)
+      .channel(`chat-proveedor:${conversacionActiva.id}`)
       .on(
         'postgres_changes',
         {
@@ -330,7 +338,7 @@ export default function ChatPage() {
     setTexto('')
     setEnviando(true)
     try {
-      await enviarMensaje(conversacionActiva.id, user.id, 'frutero', contenido)
+      await enviarMensaje(conversacionActiva.id, user.id, 'proveedor', contenido)
     } catch (e) {
       console.error(e)
       setTexto(contenido)
@@ -365,11 +373,11 @@ export default function ChatPage() {
     <div className="min-h-screen" style={{ backgroundColor: '#F8F7F3' }}>
       {/* Cabecera */}
       <div className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3" style={{ boxShadow: '0 1px 0 #E5E7EB' }}>
-        <div className="flex items-center justify-between mb-3">
+        <div className="mb-3">
           <h1 className="text-xl font-bold font-serif" style={{ color: '#222222', fontFamily: 'Fraunces, serif' }}>
             Chats
           </h1>
-          <CartIcon />
+          <p className="text-xs mt-0.5" style={{ color: '#9CA3AF' }}>Mensajes de tus fruiteros</p>
         </div>
         <div
           className="flex items-center gap-2 px-3 py-2.5"
@@ -378,7 +386,7 @@ export default function ChatPage() {
           <IconSearch />
           <input
             type="search"
-            placeholder="Buscar puesto..."
+            placeholder="Buscar fruteria..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             className="flex-1 bg-transparent text-sm outline-none"
@@ -398,12 +406,12 @@ export default function ChatPage() {
             <IconChatEmpty />
           </div>
           <h2 className="text-lg font-bold font-serif mb-2" style={{ color: '#222222' }}>
-            {busqueda ? 'Sin resultados' : 'Sin conversaciones'}
+            {busqueda ? 'Sin resultados' : 'Sin mensajes'}
           </h2>
           <p className="text-sm" style={{ color: '#6B7280' }}>
             {busqueda
-              ? 'No hay puestos que coincidan con tu busqueda.'
-              : 'Confirma un pedido para iniciar una conversacion con cada puesto.'}
+              ? 'No hay fruterias que coincidan con tu busqueda.'
+              : 'Cuando un frutero haga un pedido en tu puesto, su mensaje aparecera aqui.'}
           </p>
         </div>
       ) : (
@@ -421,7 +429,7 @@ export default function ChatPage() {
                 <div className="relative shrink-0">
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold font-serif"
-                    style={{ backgroundColor: '#F0F5F1', color: '#1B3A2A' }}
+                    style={{ backgroundColor: '#FFF4EB', color: '#F28C28' }}
                   >
                     {iniciales(conv.otroNombre)}
                   </div>
@@ -458,7 +466,7 @@ export default function ChatPage() {
                       fontWeight: conv.hayNoLeidos ? 500 : 400,
                     }}
                   >
-                    {conv.ultimoMensaje?.contenido ?? 'Inicia una conversacion'}
+                    {conv.ultimoMensaje?.contenido ?? 'Sin mensajes'}
                   </p>
                 </div>
 
@@ -471,7 +479,7 @@ export default function ChatPage() {
         </div>
       )}
 
-      <BottomNav />
+      <BottomNavProveedor />
     </div>
   )
 }

@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCartStore } from '@/lib/stores/cart'
 import { useAuthStore } from '@/lib/stores/auth'
-import { createOrder } from '@/lib/api'
+import { createOrder, getOrCreateConversacion, enviarMensaje } from '@/lib/api'
 import { sendOrderConfirmation } from '@/lib/notifications'
 import { useFase } from '@/lib/hooks/useFase'
-import type { SubtotalPorProveedor } from '@/lib/types'
+import type { SubtotalPorProveedor, Order } from '@/lib/types'
 import BottomNav from '@/components/BottomNav'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -232,6 +232,25 @@ function PantallaConfirmacion({ grupos, tarifa, total, fase }: ConfirmacionProps
   )
 }
 
+// ─── Notificación automática de pedido por puesto ────────────────────────────
+
+async function enviarMensajesDePedido(
+  order: Order,
+  grupos: SubtotalPorProveedor[],
+  fruteroNombre: string,
+): Promise<void> {
+  await Promise.all(
+    grupos.map(async (grupo) => {
+      const conv = await getOrCreateConversacion(order.fruteroId, grupo.proveedorId)
+      const productosTexto = grupo.lineas
+        .map((l) => `${l.nombreProducto} x${l.cantidad}`)
+        .join(', ')
+      const contenido = `Nuevo pedido de ${fruteroNombre}: ${productosTexto}. Total: ${grupo.subtotal.toFixed(2)}€`
+      await enviarMensaje(conv.id, order.fruteroId, 'sistema', contenido)
+    }),
+  )
+}
+
 // ─── Carrito principal ────────────────────────────────────────────────────────
 
 export default function CarritoPage() {
@@ -267,6 +286,7 @@ export default function CarritoPage() {
     })
 
     sendOrderConfirmation(user!.telefono, { id: order.id, total: totalFinal }).catch(console.error)
+    enviarMensajesDePedido(order, grupos, user!.nombre).catch(console.error)
 
     return { grupos, tarifa, totalFinal }
   }
