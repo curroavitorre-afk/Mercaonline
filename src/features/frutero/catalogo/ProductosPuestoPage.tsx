@@ -2,101 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCartStore } from '@/lib/stores/cart'
 import { useBottomNavHeight } from '@/hooks/useBottomNavHeight'
+import { getProveedorById, getProductos } from '@/lib/api'
 import type { Producto, Proveedor } from '@/lib/types'
-
-// ─── Datos mock por puesto ────────────────────────────────────────────────────
-
-interface PuestoData {
-  proveedor: Proveedor
-  productos: Producto[]
-}
-
-const PUESTOS_DATA: Record<string, PuestoData> = {
-  '1': {
-    proveedor: {
-      id: 'mock-p1', userId: 'mock-u1', nombre: 'Frutas Macías Vera',
-      descripcion: 'Frutas y verduras variadas, cítricos y tropicales', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_macias_vera2.jpg',
-    },
-    productos: [
-      { id: 'mg-1-1', proveedorId: 'mock-p1', nombre: 'Naranjas Valencia', precio: 0.45, unidad: 'kg', stockDisponible: 500, activo: true },
-      { id: 'mg-1-2', proveedorId: 'mock-p1', nombre: 'Limones', precio: 0.55, unidad: 'kg', stockDisponible: 300, activo: true },
-      { id: 'mg-1-3', proveedorId: 'mock-p1', nombre: 'Mandarinas', precio: 0.65, unidad: 'kg', stockDisponible: 400, activo: true },
-      { id: 'mg-1-4', proveedorId: 'mock-p1', nombre: 'Aguacates', precio: 1.80, unidad: 'kg', stockDisponible: 150, activo: true },
-      { id: 'mg-1-5', proveedorId: 'mock-p1', nombre: 'Mangos', precio: 1.50, unidad: 'kg', stockDisponible: 100, activo: true },
-    ],
-  },
-  '2': {
-    proveedor: {
-      id: 'mock-p2', userId: 'mock-u2', nombre: 'Frutas Martín Mariscal',
-      descripcion: 'Fruta de temporada nacional', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_martin_mariscal2.jpg',
-    },
-    productos: [
-      { id: 'mg-2-1', proveedorId: 'mock-p2', nombre: 'Fresas Huelva', precio: 1.20, unidad: 'kg', stockDisponible: 200, activo: true },
-      { id: 'mg-2-2', proveedorId: 'mock-p2', nombre: 'Melocotones', precio: 0.90, unidad: 'kg', stockDisponible: 300, activo: true },
-      { id: 'mg-2-3', proveedorId: 'mock-p2', nombre: 'Nectarinas', precio: 0.85, unidad: 'kg', stockDisponible: 250, activo: true },
-      { id: 'mg-2-4', proveedorId: 'mock-p2', nombre: 'Ciruelas', precio: 0.95, unidad: 'kg', stockDisponible: 180, activo: true },
-      { id: 'mg-2-5', proveedorId: 'mock-p2', nombre: 'Cerezas', precio: 3.50, unidad: 'kg', stockDisponible: 80, activo: true },
-    ],
-  },
-  '3': {
-    proveedor: {
-      id: 'mock-p3', userId: 'mock-u3', nombre: 'Hermanos Gallegos e Hijos',
-      descripcion: 'Verdura de hoja y hortalizas', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/gallegos_e_hijos2.jpg',
-    },
-    productos: [
-      { id: 'mg-3-1', proveedorId: 'mock-p3', nombre: 'Tomates rama', precio: 0.70, unidad: 'kg', stockDisponible: 600, activo: true },
-      { id: 'mg-3-2', proveedorId: 'mock-p3', nombre: 'Pimientos rojos', precio: 0.65, unidad: 'kg', stockDisponible: 400, activo: true },
-      { id: 'mg-3-3', proveedorId: 'mock-p3', nombre: 'Pepinos', precio: 0.40, unidad: 'kg', stockDisponible: 350, activo: true },
-      { id: 'mg-3-4', proveedorId: 'mock-p3', nombre: 'Lechugas', precio: 0.45, unidad: 'unidad', stockDisponible: 300, activo: true },
-      { id: 'mg-3-5', proveedorId: 'mock-p3', nombre: 'Judías verdes', precio: 1.10, unidad: 'kg', stockDisponible: 200, activo: true },
-    ],
-  },
-  '4': {
-    proveedor: {
-      id: 'mock-p4', userId: 'mock-u4', nombre: 'Importpatata',
-      descripcion: 'Patata, cebolla y tubérculos', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/importpatata2.jpg',
-    },
-    productos: [
-      { id: 'mg-4-1', proveedorId: 'mock-p4', nombre: 'Patata blanca', precio: 0.35, unidad: 'kg', stockDisponible: 1000, activo: true },
-      { id: 'mg-4-2', proveedorId: 'mock-p4', nombre: 'Patata nueva', precio: 0.55, unidad: 'kg', stockDisponible: 800, activo: true },
-      { id: 'mg-4-3', proveedorId: 'mock-p4', nombre: 'Cebolla', precio: 0.30, unidad: 'kg', stockDisponible: 900, activo: true },
-      { id: 'mg-4-4', proveedorId: 'mock-p4', nombre: 'Ajo morado', precio: 2.50, unidad: 'kg', stockDisponible: 200, activo: true },
-      { id: 'mg-4-5', proveedorId: 'mock-p4', nombre: 'Boniato', precio: 0.60, unidad: 'kg', stockDisponible: 400, activo: true },
-    ],
-  },
-  '5': {
-    proveedor: {
-      id: 'mock-p5', userId: 'mock-u5', nombre: 'Frutas del Pino',
-      descripcion: 'Plátano de Canarias y fruta tropical importada', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_del_pino2.jpg',
-    },
-    productos: [
-      { id: 'mg-5-1', proveedorId: 'mock-p5', nombre: 'Plátanos Canarias', precio: 0.85, unidad: 'kg', stockDisponible: 500, activo: true },
-      { id: 'mg-5-2', proveedorId: 'mock-p5', nombre: 'Piñas', precio: 0.95, unidad: 'unidad', stockDisponible: 150, activo: true },
-      { id: 'mg-5-3', proveedorId: 'mock-p5', nombre: 'Papayas', precio: 1.20, unidad: 'kg', stockDisponible: 100, activo: true },
-      { id: 'mg-5-4', proveedorId: 'mock-p5', nombre: 'Cocos', precio: 1.50, unidad: 'unidad', stockDisponible: 80, activo: true },
-      { id: 'mg-5-5', proveedorId: 'mock-p5', nombre: 'Kiwis', precio: 1.10, unidad: 'kg', stockDisponible: 200, activo: true },
-    ],
-  },
-  '6': {
-    proveedor: {
-      id: 'mock-p6', userId: 'mock-u6', nombre: 'Hortifrut Granada',
-      descripcion: 'Producto local Granada — verdura de la Vega', activo: true, estadoAprobacion: 'aprobado',
-      imagenUrl: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/hortifrut_granada2.jpg',
-    },
-    productos: [
-      { id: 'mg-6-1', proveedorId: 'mock-p6', nombre: 'Calabacín', precio: 0.45, unidad: 'kg', stockDisponible: 400, activo: true },
-      { id: 'mg-6-2', proveedorId: 'mock-p6', nombre: 'Berenjena', precio: 0.55, unidad: 'kg', stockDisponible: 300, activo: true },
-      { id: 'mg-6-3', proveedorId: 'mock-p6', nombre: 'Pimiento verde', precio: 0.50, unidad: 'kg', stockDisponible: 500, activo: true },
-      { id: 'mg-6-4', proveedorId: 'mock-p6', nombre: 'Habas', precio: 1.80, unidad: 'kg', stockDisponible: 150, activo: true },
-      { id: 'mg-6-5', proveedorId: 'mock-p6', nombre: 'Espárragos trigueros', precio: 2.20, unidad: 'kg', stockDisponible: 100, activo: true },
-    ],
-  },
-}
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -133,13 +40,29 @@ export default function ProductosPuestoPage() {
   const { addLine, getTotalLineas } = useCartStore()
   const bottomNavHeight = useBottomNavHeight()
 
-  const puestoData = proveedorId ? PUESTOS_DATA[proveedorId] : undefined
+  const [proveedor, setProveedor] = useState<Proveedor | null>(null)
+  const [productos, setProductos] = useState<Producto[]>([])
+  const [cargando, setCargando] = useState(true)
+  const [cantidades, setCantidades] = useState<Record<string, number>>({})
+  const [toastProducto, setToastProducto] = useState<string | null>(null)
+
   const totalLineas = getTotalLineas()
 
-  const [cantidades, setCantidades] = useState<Record<string, number>>(() =>
-    Object.fromEntries((puestoData?.productos ?? []).map((p) => [p.id, 1])),
-  )
-  const [toastProducto, setToastProducto] = useState<string | null>(null)
+  useEffect(() => {
+    if (!proveedorId) return
+    setCargando(true)
+    Promise.all([getProveedorById(proveedorId), getProductos(proveedorId)])
+      .then(([p, prods]) => {
+        setProveedor(p)
+        setProductos(prods)
+        setCantidades(Object.fromEntries(prods.map((prod) => [prod.id, 1])))
+      })
+      .catch(() => {
+        setProveedor(null)
+        setProductos([])
+      })
+      .finally(() => setCargando(false))
+  }, [proveedorId])
 
   useEffect(() => {
     if (!toastProducto) return
@@ -147,7 +70,15 @@ export default function ProductosPuestoPage() {
     return () => clearTimeout(t)
   }, [toastProducto])
 
-  if (!puestoData) {
+  if (cargando) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F7F3' }}>
+        <p className="text-sm" style={{ color: '#6B7280' }}>Cargando productos...</p>
+      </div>
+    )
+  }
+
+  if (!proveedor) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F7F3' }}>
         <div className="text-center px-6">
@@ -163,8 +94,6 @@ export default function ProductosPuestoPage() {
       </div>
     )
   }
-
-  const { proveedor, productos } = puestoData
 
   const setCantidad = (productoId: string, valor: number) => {
     setCantidades((prev) => ({ ...prev, [productoId]: Math.max(1, valor) }))

@@ -1,75 +1,27 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
 import { useAuthStore } from '@/lib/stores/auth'
+import { getProveedores } from '@/lib/api'
+import type { Proveedor } from '@/lib/types'
 
-interface Puesto {
-  id: number
-  nombre: string
-  especialidad: string
-  pabellon: string
-  numPuesto: string
-  foto: string
-  disponibilidad: 'mañana' | 'pocas'
+// numPuesto y disponibilidad son datos de display que no están en el schema SQL.
+// Se mantienen aquí como mapa estático keyed por UUID fijo de cada puesto.
+const PUESTO_META: Record<string, { numPuesto: string; disponibilidad: 'mañana' | 'pocas' }> = {
+  'aa000001-0000-0000-0000-000000000001': { numPuesto: '117 · 137',               disponibilidad: 'mañana' },
+  'aa000002-0000-0000-0000-000000000002': { numPuesto: '113 · 114 · 115 · 116',   disponibilidad: 'mañana' },
+  'aa000003-0000-0000-0000-000000000003': { numPuesto: '111 · 131 · 132 · 133',   disponibilidad: 'mañana' },
+  'aa000004-0000-0000-0000-000000000004': { numPuesto: '105 · 106 · 107',         disponibilidad: 'mañana' },
+  'aa000005-0000-0000-0000-000000000005': { numPuesto: '139',                     disponibilidad: 'pocas'  },
+  'aa000006-0000-0000-0000-000000000006': { numPuesto: '101 · 120 · 228-230',     disponibilidad: 'mañana' },
 }
 
-const PUESTOS: Puesto[] = [
-  {
-    id: 1,
-    nombre: 'Frutas Macías Vera',
-    especialidad: 'Frutas y verduras variadas, cítricos y tropicales',
-    pabellon: '',
-    numPuesto: '117 · 137',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_macias_vera2.jpg',
-    disponibilidad: 'mañana',
-  },
-  {
-    id: 2,
-    nombre: 'Frutas Martín Mariscal',
-    especialidad: 'Fruta de temporada nacional',
-    pabellon: '',
-    numPuesto: '113 · 114 · 115 · 116',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_martin_mariscal2.jpg',
-    disponibilidad: 'mañana',
-  },
-  {
-    id: 3,
-    nombre: 'Hermanos Gallegos e Hijos',
-    especialidad: 'Verdura de hoja y hortalizas',
-    pabellon: '',
-    numPuesto: '111 · 131 · 132 · 133',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/gallegos_e_hijos2.jpg',
-    disponibilidad: 'mañana',
-  },
-  {
-    id: 4,
-    nombre: 'Importpatata',
-    especialidad: 'Patata, cebolla y tubérculos',
-    pabellon: '',
-    numPuesto: '105 · 106 · 107',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/importpatata2.jpg',
-    disponibilidad: 'mañana',
-  },
-  {
-    id: 5,
-    nombre: 'Frutas del Pino',
-    especialidad: 'Plátano de Canarias y fruta tropical importada',
-    pabellon: '',
-    numPuesto: '139',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/frutas_del_pino2.jpg',
-    disponibilidad: 'pocas',
-  },
-  {
-    id: 6,
-    nombre: 'Hortifrut Granada',
-    especialidad: 'Producto local Granada — verdura de la Vega',
-    pabellon: '',
-    numPuesto: '101 · 120 · 228-230',
-    foto: 'https://xxxpwpigllobofzvyfaq.supabase.co/storage/v1/object/public/puestos/hortifrut_granada2.jpg',
-    disponibilidad: 'mañana',
-  },
-]
+// La descripción en BD incluye ". Puestos X" al final — extraemos solo la especialidad.
+function getEspecialidad(descripcion: string): string {
+  const idx = descripcion.indexOf('. Puesto')
+  return idx >= 0 ? descripcion.slice(0, idx) : descripcion
+}
 
 const FILTROS = ['Todos', 'Cítricos', 'Verdura', 'Tropical', 'Hueso', 'Local']
 
@@ -105,11 +57,21 @@ export default function CatalogoPage() {
   const { user } = useAuthStore()
   const [busqueda, setBusqueda] = useState('')
   const [filtroActivo, setFiltroActivo] = useState('Todos')
+  const [puestos, setPuestos] = useState<Proveedor[]>([])
+  const [cargando, setCargando] = useState(true)
 
-  const puestosFiltrados = PUESTOS.filter((p) =>
-    busqueda === '' ||
-    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    p.especialidad.toLowerCase().includes(busqueda.toLowerCase()),
+  useEffect(() => {
+    getProveedores()
+      .then(setPuestos)
+      .catch(() => setPuestos([]))
+      .finally(() => setCargando(false))
+  }, [])
+
+  const puestosFiltrados = puestos.filter(
+    (p) =>
+      busqueda === '' ||
+      p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+      p.descripcion.toLowerCase().includes(busqueda.toLowerCase()),
   )
 
   return (
@@ -192,64 +154,73 @@ export default function CatalogoPage() {
 
       {/* Lista de puestos */}
       <div className="px-4 py-4 space-y-4">
-        {puestosFiltrados.map((puesto) => (
-          <div
-            key={puesto.id}
-            className="bg-white overflow-hidden"
-            style={{ borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
-          >
-            {/* Foto */}
-            <div className="relative overflow-hidden" style={{ height: 160 }}>
-              <img
-                src={puesto.foto}
-                alt={puesto.nombre}
-                className="w-full h-full object-cover"
-                style={{ borderRadius: '16px 16px 0 0' }}
-              />
-              {/* Badge de disponibilidad */}
-              <div className="absolute top-3 right-3">
-                {puesto.disponibilidad === 'mañana' ? (
-                  <span
-                    className="text-[11px] font-semibold px-2.5 py-1"
-                    style={{ backgroundColor: '#1B3A2A', color: '#FFFFFF', borderRadius: 20 }}
-                  >
-                    Disponible mañana
-                  </span>
-                ) : (
-                  <span
-                    className="text-[11px] font-semibold px-2.5 py-1"
-                    style={{ backgroundColor: '#F28C28', color: '#FFFFFF', borderRadius: 20 }}
-                  >
-                    Pocas unidades
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Contenido */}
-            <div className="p-4">
-              <h2 className="text-lg font-bold font-serif mb-0.5" style={{ color: '#222222' }}>
-                {puesto.nombre}
-              </h2>
-              <p className="text-sm mb-3" style={{ color: '#6B7280' }}>
-                {puesto.especialidad}
-              </p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1" style={{ color: '#6B7280' }}>
-                  <IconLocation />
-                  <span className="text-xs">Puestos {puesto.numPuesto}</span>
-                </div>
-                <button
-                  onClick={() => navigate(`/app/frutero/catalogo/${puesto.id}`)}
-                  className="text-xs font-semibold px-4 py-2 text-white transition-colors"
-                  style={{ backgroundColor: '#1B3A2A', borderRadius: 10 }}
-                >
-                  Ver productos
-                </button>
-              </div>
-            </div>
+        {cargando && (
+          <div className="text-center py-12 text-sm" style={{ color: '#6B7280' }}>
+            Cargando puestos...
           </div>
-        ))}
+        )}
+
+        {!cargando && puestosFiltrados.map((puesto) => {
+          const meta = PUESTO_META[puesto.id] ?? { numPuesto: '', disponibilidad: 'mañana' as const }
+          return (
+            <div
+              key={puesto.id}
+              className="bg-white overflow-hidden"
+              style={{ borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+            >
+              {/* Foto */}
+              <div className="relative overflow-hidden" style={{ height: 160 }}>
+                <img
+                  src={puesto.imagenUrl}
+                  alt={puesto.nombre}
+                  className="w-full h-full object-cover"
+                  style={{ borderRadius: '16px 16px 0 0' }}
+                />
+                {/* Badge de disponibilidad */}
+                <div className="absolute top-3 right-3">
+                  {meta.disponibilidad === 'mañana' ? (
+                    <span
+                      className="text-[11px] font-semibold px-2.5 py-1"
+                      style={{ backgroundColor: '#1B3A2A', color: '#FFFFFF', borderRadius: 20 }}
+                    >
+                      Disponible mañana
+                    </span>
+                  ) : (
+                    <span
+                      className="text-[11px] font-semibold px-2.5 py-1"
+                      style={{ backgroundColor: '#F28C28', color: '#FFFFFF', borderRadius: 20 }}
+                    >
+                      Pocas unidades
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Contenido */}
+              <div className="p-4">
+                <h2 className="text-lg font-bold font-serif mb-0.5" style={{ color: '#222222' }}>
+                  {puesto.nombre}
+                </h2>
+                <p className="text-sm mb-3" style={{ color: '#6B7280' }}>
+                  {getEspecialidad(puesto.descripcion)}
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1" style={{ color: '#6B7280' }}>
+                    <IconLocation />
+                    <span className="text-xs">Puestos {meta.numPuesto}</span>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/app/frutero/catalogo/${puesto.id}`)}
+                    className="text-xs font-semibold px-4 py-2 text-white transition-colors"
+                    style={{ backgroundColor: '#1B3A2A', borderRadius: 10 }}
+                  >
+                    Ver productos
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       <BottomNav />
