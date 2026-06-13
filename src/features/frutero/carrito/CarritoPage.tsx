@@ -72,11 +72,18 @@ interface ModalPagoProps {
 
 function ModalPago({ total, onClose, onSuccess }: ModalPagoProps) {
   const [cargando, setCargando] = useState(false)
+  const [errorModal, setErrorModal] = useState<string | null>(null)
 
   const handleConfirmar = async () => {
     setCargando(true)
+    setErrorModal(null)
     await new Promise((resolve) => setTimeout(resolve, 1500))
-    await onSuccess()
+    try {
+      await onSuccess()
+    } catch (e) {
+      setCargando(false)
+      setErrorModal(e instanceof Error ? e.message : 'Error al procesar el pago')
+    }
   }
 
   return (
@@ -100,9 +107,15 @@ function ModalPago({ total, onClose, onSuccess }: ModalPagoProps) {
           </span>
         </div>
 
-        <p className="text-center text-xs mb-8" style={{ color: '#6B7280' }}>
+        <p className="text-center text-xs mb-4" style={{ color: '#6B7280' }}>
           Pago seguro procesado por Stripe
         </p>
+
+        {errorModal && (
+          <p className="text-center text-xs mb-4 px-2 py-2" style={{ color: '#DC2626', backgroundColor: '#FEE2E2', borderRadius: 8 }}>
+            {errorModal}
+          </p>
+        )}
 
         <div className="flex gap-3">
           <button
@@ -263,6 +276,7 @@ export default function CarritoPage() {
   const [confirmado, setConfirmado] = useState(false)
   const [resumen, setResumen] = useState<ConfirmacionProps | null>(null)
   const [cargandoFase0, setCargandoFase0] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   const subtotalesPorProveedor = getSubtotalPorProveedor()
   const subtotalBruto = getSubtotalBruto()
@@ -301,11 +315,15 @@ export default function CarritoPage() {
 
   const handleConfirmarFase0 = async () => {
     setCargandoFase0(true)
+    setErrorMsg(null)
     try {
       const { grupos, tarifa, totalFinal } = await crearPedido()
       setResumen({ grupos, tarifa, total: totalFinal, fase: 'fase0' })
       clear()
       setConfirmado(true)
+    } catch (e) {
+      console.error('[CarritoPage] Error al confirmar pedido:', e)
+      setErrorMsg(e instanceof Error ? e.message : 'Error al confirmar el pedido. Inténtalo de nuevo.')
     } finally {
       setCargandoFase0(false)
     }
@@ -447,6 +465,11 @@ export default function CarritoPage() {
                   </span>
                 ) : 'Confirmar pedido para recoger'}
               </button>
+              {errorMsg && (
+                <p className="text-center text-sm px-3 py-2" style={{ color: '#DC2626', backgroundColor: '#FEE2E2', borderRadius: 8 }}>
+                  {errorMsg}
+                </p>
+              )}
               <p className="text-center text-xs" style={{ color: '#6B7280' }}>
                 Recogida en el puesto desde las 4:00
               </p>

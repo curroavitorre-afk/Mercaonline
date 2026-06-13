@@ -352,6 +352,33 @@ export async function getOrderById(id: string): Promise<Order | null> {
   return toOrder(data as OrderRow)
 }
 
+export async function getOrdersForProveedor(proveedorId: string): Promise<Order[]> {
+  // Primero obtenemos los order_ids que tienen líneas de este proveedor
+  const { data: lines, error: linesError } = await supabase
+    .from('order_lines')
+    .select('order_id')
+    .eq('proveedor_id', proveedorId)
+
+  if (linesError) throw new Error(linesError.message)
+
+  const orderIds = [...new Set((lines ?? []).map((l) => l.order_id as string))]
+  if (orderIds.length === 0) return []
+
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, order_lines(*)')
+    .in('id', orderIds)
+    .order('created_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+
+  return (data as OrderRow[]).map((row) => {
+    const order = toOrder(row)
+    order.lineas = order.lineas.filter((l) => l.proveedorId === proveedorId)
+    return order
+  })
+}
+
 export async function updateOrderStatus(id: string, estado: OrderStatus): Promise<void> {
   const { error } = await supabase.from('orders').update({ estado }).eq('id', id)
   if (error) throw new Error(error.message)

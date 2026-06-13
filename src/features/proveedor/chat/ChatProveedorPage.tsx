@@ -250,10 +250,19 @@ export default function ChatProveedorPage() {
 
   // Obtiene el proveedorId del usuario actual
   useEffect(() => {
-    if (!user) return
+    if (!user) {
+      setCargandoLista(false)
+      return
+    }
     getProveedorByUserId(user.id)
-      .then((p) => { if (p) setProveedorId(p.id) })
-      .catch(console.error)
+      .then((p) => {
+        if (p) setProveedorId(p.id)
+        else setCargandoLista(false)
+      })
+      .catch((e) => {
+        console.error(e)
+        setCargandoLista(false)
+      })
   }, [user])
 
   const cargarConversaciones = useCallback(async () => {

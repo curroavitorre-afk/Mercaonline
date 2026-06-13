@@ -1,59 +1,17 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
-import { MOCK_PROVEEDORES } from '@/lib/mock-data'
+import { getProveedorByUserId, getOrdersForProveedor, getFruteros } from '@/lib/api'
+import type { Order, OrderStatus, Proveedor, User } from '@/lib/types'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
 
-type EstadoPedidoProveedor = 'pendiente' | 'confirmado' | 'recogido'
-
-interface LineaPedidoProveedor {
-  nombre: string
-  cantidad: number
-  unidad: string
-}
-
-interface PedidoProveedor {
-  id: string
-  fruteroRef: string
-  lineas: LineaPedidoProveedor[]
-  horaRecogida: string
-  estado: EstadoPedidoProveedor
-}
-
-const PEDIDOS_MOCK: PedidoProveedor[] = [
-  {
-    id: 'pp1',
-    fruteroRef: 'Frutería #01',
-    lineas: [
-      { nombre: 'Naranjas Valencia', cantidad: 50, unidad: 'kg' },
-      { nombre: 'Limones', cantidad: 20, unidad: 'kg' },
-    ],
-    horaRecogida: '04:00 – 05:00',
-    estado: 'confirmado',
-  },
-  {
-    id: 'pp2',
-    fruteroRef: 'Frutería #02',
-    lineas: [
-      { nombre: 'Naranjas Valencia', cantidad: 30, unidad: 'kg' },
-    ],
-    horaRecogida: '04:00 – 05:00',
-    estado: 'pendiente',
-  },
-  {
-    id: 'pp3',
-    fruteroRef: 'Frutería #03',
-    lineas: [
-      { nombre: 'Limones', cantidad: 15, unidad: 'kg' },
-    ],
-    horaRecogida: '04:30 – 05:30',
-    estado: 'pendiente',
-  },
-]
-
-const ESTADO_CONFIG: Record<EstadoPedidoProveedor, { label: string; bg: string; color: string }> = {
-  pendiente: { label: 'Pendiente', bg: '#FEF3C7', color: '#92400E' },
-  confirmado: { label: 'Confirmado', bg: '#D1FAE5', color: '#065F46' },
-  recogido: { label: 'Recogido', bg: '#EEF2FF', color: '#4338CA' },
+const ESTADO_CONFIG: Record<OrderStatus, { label: string; bg: string; color: string }> = {
+  confirmado:  { label: 'Pendiente',  bg: '#FEF3C7', color: '#92400E' },
+  en_recogida: { label: 'En recogida', bg: '#FEF3C7', color: '#92400E' },
+  recogido:    { label: 'Recogido',   bg: '#D1FAE5', color: '#065F46' },
+  en_reparto:  { label: 'Preparado',  bg: '#D1FAE5', color: '#065F46' },
+  entregado:   { label: 'Entregado',  bg: '#EEF2FF', color: '#4338CA' },
+  incidencia:  { label: 'Incidencia', bg: '#FEE2E2', color: '#991B1B' },
 }
 
 function IconBack() {
@@ -72,11 +30,11 @@ function IconBox() {
   )
 }
 
-function IconClock() {
+function Spinner() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12,6 12,12 16,14" />
+    <svg className="animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke="#E5E7EB" strokeWidth="2.5" />
+      <path d="M12 3a9 9 0 0 1 9 9" stroke="#1B3A2A" strokeWidth="2.5" strokeLinecap="round" />
     </svg>
   )
 }
@@ -84,12 +42,45 @@ function IconClock() {
 export default function PedidosProveedorPage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
-  const miProveedor = MOCK_PROVEEDORES.find((p) => p.userId === user?.id) ?? MOCK_PROVEEDORES[0]
 
-  if (!miProveedor) {
+  const [proveedor, setProveedor] = useState<Proveedor | null>(null)
+  const [pedidos, setPedidos] = useState<Order[]>([])
+  const [fruterosMap, setFruterosMap] = useState<Record<string, User>>({})
+  const [cargando, setCargando] = useState(true)
+
+  useEffect(() => {
+    if (!user) return
+    getProveedorByUserId(user.id)
+      .then((p) => {
+        if (!p) {
+          setCargando(false)
+          return
+        }
+        setProveedor(p)
+        return Promise.all([getOrdersForProveedor(p.id), getFruteros()])
+      })
+      .then((result) => {
+        if (!result) return
+        const [ords, fruteros] = result
+        setPedidos(ords)
+        setFruterosMap(Object.fromEntries(fruteros.map((f) => [f.id, f])))
+      })
+      .catch(console.error)
+      .finally(() => setCargando(false))
+  }, [user])
+
+  if (cargando) {
     return (
-      <div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100vh', fontFamily:'Inter, sans-serif', color:'#6B7280'}}>
-        Cargando...
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F7F3' }}>
+        <Spinner />
+      </div>
+    )
+  }
+
+  if (!proveedor) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F7F3', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+        Sin puesto asociado
       </div>
     )
   }
@@ -106,21 +97,18 @@ export default function PedidosProveedorPage() {
           >
             <IconBack />
           </button>
-          <button
-            onClick={() => navigate('/')}
-            className="block text-left"
-          >
+          <button onClick={() => navigate('/')} className="block text-left">
             <span className="text-[11px] font-semibold" style={{ color: '#1B3A2A', fontFamily: 'Fraunces, serif' }}>MercaOnline</span>
             <span className="text-[9px] block mt-0.5" style={{ color: '#9CA3AF' }}>Inicio</span>
           </button>
         </div>
         <h1 className="text-xl font-bold font-serif" style={{ color: '#222222' }}>Pedidos recibidos</h1>
         <p className="text-sm mt-0.5" style={{ color: '#6B7280' }}>
-          {miProveedor.nombre} · entrega mañana
+          {proveedor.nombre}
         </p>
       </div>
 
-      {PEDIDOS_MOCK.length === 0 ? (
+      {pedidos.length === 0 ? (
         <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
           <div className="mb-4" style={{ color: '#D1D5DB' }}>
             <IconBox />
@@ -129,7 +117,7 @@ export default function PedidosProveedorPage() {
             Sin pedidos de momento
           </h2>
           <p className="text-sm" style={{ color: '#6B7280' }}>
-            Los pedidos para mañana aparecerán aquí a partir de las 20:00.
+            Los pedidos aparecerán aquí cuando un frutero confirme un pedido de tu puesto.
           </p>
         </div>
       ) : (
@@ -140,16 +128,23 @@ export default function PedidosProveedorPage() {
             style={{ backgroundColor: '#F0F5F1', borderRadius: 12, border: '1px solid #D4E8DA' }}
           >
             <span className="text-lg font-bold font-serif" style={{ color: '#1B3A2A' }}>
-              {PEDIDOS_MOCK.length}
+              {pedidos.length}
             </span>
             <p className="text-sm" style={{ color: '#1B3A2A' }}>
-              pedidos para mañana · recogida entre las{' '}
+              {pedidos.length === 1 ? 'pedido recibido' : 'pedidos recibidos'} · recogida entre las{' '}
               <span className="font-semibold">4:00 y las 5:30</span>
             </p>
           </div>
 
-          {PEDIDOS_MOCK.map((pedido) => {
+          {pedidos.map((pedido) => {
+            const frutero = fruterosMap[pedido.fruteroId]
+            const fruteroNombre = frutero?.nombre ?? 'Frutería'
             const cfg = ESTADO_CONFIG[pedido.estado]
+            const fecha = new Date(pedido.fechaConfirmacion).toLocaleDateString('es-ES', {
+              day: 'numeric',
+              month: 'short',
+            })
+
             return (
               <div
                 key={pedido.id}
@@ -159,13 +154,13 @@ export default function PedidosProveedorPage() {
                 {/* Cabecera pedido */}
                 <div className="px-4 pt-4 pb-3 flex items-start justify-between">
                   <div>
+                    <p className="text-xs mb-0.5" style={{ color: '#9CA3AF' }}>{fecha}</p>
                     <p className="font-bold font-serif" style={{ color: '#222222' }}>
-                      {pedido.fruteroRef}
+                      {fruteroNombre}
                     </p>
-                    <div className="flex items-center gap-1 mt-1" style={{ color: '#6B7280' }}>
-                      <IconClock />
-                      <span className="text-xs">Recogida {pedido.horaRecogida}</span>
-                    </div>
+                    <p className="text-xs mt-0.5" style={{ color: '#6B7280' }}>
+                      Pedido #{pedido.id.slice(0, 8).toUpperCase()}
+                    </p>
                   </div>
                   <span
                     className="text-[11px] font-semibold px-2.5 py-1"
@@ -185,18 +180,24 @@ export default function PedidosProveedorPage() {
                   </p>
                   <div className="space-y-2">
                     {pedido.lineas.map((linea) => (
-                      <div key={linea.nombre} className="flex items-center justify-between">
+                      <div key={linea.productoId} className="flex items-center justify-between">
                         <span className="text-sm" style={{ color: '#222222' }}>
-                          {linea.nombre}
+                          {linea.nombreProducto}
                         </span>
                         <span
                           className="text-xs font-semibold px-2.5 py-1"
                           style={{ backgroundColor: '#F8F7F3', color: '#1B3A2A', borderRadius: 20 }}
                         >
-                          {linea.cantidad} {linea.unidad}
+                          {linea.cantidad} {linea.precioUnitario > 0 ? `· ${(linea.subtotal).toFixed(2)} €` : ''}
                         </span>
                       </div>
                     ))}
+                  </div>
+                  <div className="flex justify-between items-center mt-3 pt-2" style={{ borderTop: '1px solid #F3F4F6' }}>
+                    <span className="text-sm" style={{ color: '#6B7280' }}>Subtotal tu puesto</span>
+                    <span className="text-sm font-bold font-serif" style={{ color: '#1B3A2A' }}>
+                      {pedido.lineas.reduce((acc, l) => acc + l.subtotal, 0).toFixed(2)} €
+                    </span>
                   </div>
                 </div>
               </div>

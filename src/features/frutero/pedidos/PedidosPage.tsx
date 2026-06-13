@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MOCK_ORDERS, MOCK_PRODUCTOS, MOCK_PROVEEDORES } from '@/lib/mock-data'
 import { useCartStore } from '@/lib/stores/cart'
+import { useAuthStore } from '@/lib/stores/auth'
+import { getOrdersByFrutero, getProveedores, getProductos } from '@/lib/api'
 import { useFase } from '@/lib/hooks/useFase'
 import BottomNav from '@/components/BottomNav'
 import CartIcon from '@/components/CartIcon'
-import type { Order, OrderStatus } from '@/lib/types'
+import type { Order, OrderStatus, Proveedor, Producto } from '@/lib/types'
 
 // ─── Timeline ─────────────────────────────────────────────────────────────────
 
@@ -175,6 +176,17 @@ function IconBox() {
   )
 }
 
+// ─── Spinner ──────────────────────────────────────────────────────────────────
+
+function Spinner() {
+  return (
+    <svg className="animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke="#E5E7EB" strokeWidth="2.5" />
+      <path d="M12 3a9 9 0 0 1 9 9" stroke="#1B3A2A" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 // ─── Modal conflicto de carrito ───────────────────────────────────────────────
 
 interface ModalConflictoProps {
@@ -234,12 +246,17 @@ function ModalConflicto({ onSustituir, onAnadir, onCancelar }: ModalConflictoPro
 export default function PedidosPage() {
   const navigate = useNavigate()
   const { lineas, addLine, clear } = useCartStore()
+  const { user } = useAuthStore()
   const { fase } = useFase()
 
+  const [pedidos, setPedidos] = useState<Order[]>([])
+  const [proveedoresMap, setProveedoresMap] = useState<Record<string, Proveedor>>({})
+  const [productosMap, setProductosMap] = useState<Record<string, Producto>>({})
+  const [cargando, setCargando] = useState(true)
   const [pedidoConflicto, setPedidoConflicto] = useState<Order | null>(null)
   const [toastVisible, setToastVisible] = useState(false)
 
-  const hayPedidos = MOCK_ORDERS.length > 0
+  const hayPedidos = pedidos.length > 0
 
   useEffect(() => {
     if (!toastVisible) return
@@ -247,10 +264,22 @@ export default function PedidosPage() {
     return () => clearTimeout(t)
   }, [toastVisible])
 
+  useEffect(() => {
+    if (!user) return
+    Promise.all([getOrdersByFrutero(user.id), getProveedores(), getProductos()])
+      .then(([ords, provs, prods]) => {
+        setPedidos(ords)
+        setProveedoresMap(Object.fromEntries(provs.map((p) => [p.id, p])))
+        setProductosMap(Object.fromEntries(prods.map((p) => [p.id, p])))
+      })
+      .catch(console.error)
+      .finally(() => setCargando(false))
+  }, [user])
+
   const cargarLineasEnCarrito = (pedido: Order) => {
     for (const linea of pedido.lineas) {
-      const producto = MOCK_PRODUCTOS.find((p) => p.id === linea.productoId)
-      const proveedor = MOCK_PROVEEDORES.find((p) => p.id === linea.proveedorId)
+      const producto = productosMap[linea.productoId]
+      const proveedor = proveedoresMap[linea.proveedorId]
       if (producto && proveedor) {
         addLine(producto, proveedor, linea.cantidad)
       }
@@ -322,9 +351,13 @@ export default function PedidosPage() {
         </div>
       </div>
 
-      {hayPedidos ? (
+      {cargando ? (
+        <div className="flex justify-center py-20">
+          <Spinner />
+        </div>
+      ) : hayPedidos ? (
         <div className="px-4 py-4 space-y-4">
-          {MOCK_ORDERS.map((pedido) => {
+          {pedidos.map((pedido) => {
             const fecha = new Date(pedido.fechaConfirmacion).toLocaleDateString('es-ES', {
               day: 'numeric',
               month: 'long',
@@ -361,21 +394,41 @@ export default function PedidosPage() {
                   </div>
                 )}
 
-                {/* Detalle de líneas */}
+                {/* Detalle de líneas agrupadas por proveedor */}
                 <div className="px-4 pb-3" style={{ borderTop: '1px solid #F3F4F6', paddingTop: 12 }}>
                   <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#9CA3AF', letterSpacing: '0.1em' }}>
                     Artículos
                   </p>
-                  <div className="space-y-1.5">
-                    {pedido.lineas.map((linea) => (
-                      <div key={linea.productoId} className="flex justify-between items-center">
-                        <span className="text-sm" style={{ color: '#222222' }}>
-                          {linea.nombreProducto}
-                          <span className="ml-1 text-xs" style={{ color: '#9CA3AF' }}>×{linea.cantidad}</span>
-                        </span>
-                        <span className="text-sm font-medium" style={{ color: '#222222' }}>
-                          {linea.subtotal.toFixed(2)} €
-                        </span>
+                  <div className="space-y-3">
+                    {Object.entries(
+                      pedido.lineas.reduce<Record<string, { nombre: string; lineas: typeof pedido.lineas }>>((acc, l) => {
+                        const nombre = proveedoresMap[l.proveedorId]?.nombre ?? 'Puesto'
+                        const entry = acc[l.proveedorId]
+                        if (entry) {
+                          entry.lineas.push(l)
+                        } else {
+                          acc[l.proveedorId] = { nombre, lineas: [l] }
+                        }
+                        return acc
+                      }, {})
+                    ).map(([pid, grupo]) => (
+                      <div key={pid}>
+                        <p className="text-xs font-semibold mb-1.5" style={{ color: '#1B3A2A' }}>
+                          {grupo.nombre}
+                        </p>
+                        <div className="space-y-1">
+                          {grupo.lineas.map((linea) => (
+                            <div key={linea.productoId} className="flex justify-between items-center">
+                              <span className="text-sm" style={{ color: '#222222' }}>
+                                {linea.nombreProducto}
+                                <span className="ml-1 text-xs" style={{ color: '#9CA3AF' }}>×{linea.cantidad}</span>
+                              </span>
+                              <span className="text-sm font-medium" style={{ color: '#222222' }}>
+                                {linea.subtotal.toFixed(2)} €
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
