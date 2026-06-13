@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
 import { supabase } from '@/lib/supabase'
 import { loginUser } from '@/lib/api'
-import { MOCK_USERS } from '@/lib/mock-data'
 import type { Role } from '@/lib/types'
 
 const MOCK_PHONES = ['600000001', '600000002']
@@ -89,11 +88,9 @@ export default function LoginPage() {
     setIsLoading(true)
     try {
       if (demoMode && token === '123456') {
-        const mockUser = MOCK_USERS.find(u => u.telefono === telefono.trim())
-        if (mockUser) {
-          setUser(mockUser)
-          navigate(from ?? ROLE_HOME[mockUser.role], { replace: true })
-        }
+        const user = await loginUser(telefono.trim())
+        setUser(user)
+        navigate(from ?? ROLE_HOME[user.role], { replace: true })
         return
       }
 
@@ -183,10 +180,16 @@ export default function LoginPage() {
       setRepartidorError('Código incorrecto')
       return
     }
-    const mockUser = MOCK_USERS.find(u => u.telefono === '600000003')
-    if (!mockUser) return
-    setUser(mockUser)
-    navigate(from ?? ROLE_HOME[mockUser.role], { replace: true })
+    setIsLoading(true)
+    try {
+      const user = await loginUser('600000003')
+      setUser(user)
+      navigate(from ?? ROLE_HOME[user.role], { replace: true })
+    } catch {
+      setRepartidorError('Error al acceder. Contacta con soporte.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
