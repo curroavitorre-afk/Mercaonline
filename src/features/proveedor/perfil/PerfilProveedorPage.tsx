@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
-import { MOCK_PROVEEDORES } from '@/lib/mock-data'
+import { getProveedorByUserId } from '@/lib/api'
+import type { Proveedor } from '@/lib/types'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
 
 function IconPhone() {
@@ -71,7 +73,12 @@ export default function PerfilProveedorPage() {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
 
-  const miProveedor = MOCK_PROVEEDORES.find((p) => p.userId === user?.id) ?? MOCK_PROVEEDORES[0]
+  const [miProveedor, setMiProveedor] = useState<Proveedor | null>(null)
+
+  useEffect(() => {
+    if (!user?.id) return
+    getProveedorByUserId(user.id).then((prov) => setMiProveedor(prov))
+  }, [user?.id])
 
   function handleLogout() {
     logout()

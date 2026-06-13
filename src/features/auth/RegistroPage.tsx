@@ -246,7 +246,7 @@ export default function RegistroPage() {
                     type="text"
                     required
                     autoComplete="name"
-                    placeholder={role === 'frutero' ? 'Frutería García' : 'Frutas García — Puesto 12'}
+                    placeholder={role === 'frutero' ? 'Frutería Centro' : 'Frutas Macías — Puesto 12'}
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     className="block w-full px-4 py-3 text-sm outline-none transition-all"

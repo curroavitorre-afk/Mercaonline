@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
-import { MOCK_PROVEEDORES, MOCK_PRODUCTOS } from '@/lib/mock-data'
-import type { Producto, Unidad } from '@/lib/types'
+import { getProveedorByUserId, getProductosByProveedor, createProducto, updateProducto, deleteProducto } from '@/lib/api'
+import type { Producto, Proveedor, Unidad } from '@/lib/types'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -187,12 +187,21 @@ const FORM_VACIO: FormState = {
 export default function MiCatalogoPage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
-  const miProveedor = MOCK_PROVEEDORES.find((p) => p.userId === user?.id) ?? MOCK_PROVEEDORES[0]
 
-  const [productos, setProductos] = useState<Producto[]>(
-    MOCK_PRODUCTOS.filter((p) => p.proveedorId === (miProveedor?.id ?? '')),
-  )
+  const [miProveedor, setMiProveedor] = useState<Proveedor | null>(null)
+  const [productos, setProductos] = useState<Producto[]>([])
   const [showAlbaranModal, setShowAlbaranModal] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (!user?.id) return
+    getProveedorByUserId(user.id).then(async (prov) => {
+      if (!prov) return
+      setMiProveedor(prov)
+      const prods = await getProductosByProveedor(prov.id)
+      setProductos(prods)
+    })
+  }, [user?.id])
 
   const [showModal, setShowModal] = useState(false)
   const [productoEditar, setProductoEditar] = useState<Producto | null>(null)
@@ -208,10 +217,16 @@ export default function MiCatalogoPage() {
     return () => clearTimeout(t)
   }, [toastMsg])
 
-  function handleToggle(id: string) {
-    setProductos((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, activo: !p.activo } : p)),
-    )
+  async function handleToggle(id: string) {
+    const producto = productos.find((p) => p.id === id)
+    if (!producto) return
+    const newActivo = !producto.activo
+    setProductos((prev) => prev.map((p) => (p.id === id ? { ...p, activo: newActivo } : p)))
+    try {
+      await updateProducto(id, { activo: newActivo })
+    } catch {
+      setProductos((prev) => prev.map((p) => (p.id === id ? { ...p, activo: !newActivo } : p)))
+    }
   }
 
   function openAdd() {
@@ -239,54 +254,58 @@ export default function MiCatalogoPage() {
     setShowModal(true)
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     const nombre = form.nombre.trim()
     const precio = parseFloat(form.precio.replace(',', '.'))
     const stock = parseInt(form.stock, 10)
     if (!nombre) { setFormError('El nombre es obligatorio'); return }
     if (isNaN(precio) || precio < 0) { setFormError('Precio no valido'); return }
     if (isNaN(stock) || stock < 0) { setFormError('Stock no valido'); return }
+    if (!miProveedor) return
     setFormError('')
-
-    if (productoEditar) {
-      setProductos((prev) =>
-        prev.map((p) =>
-          p.id === productoEditar.id
-            ? {
-                ...p,
-                nombre,
-                precio,
-                stockDisponible: stock,
-                unidad: form.unidad as Unidad,
-                descripcion: form.descripcion.trim() || undefined,
-                activo: form.disponible,
-              }
-            : p,
-        ),
-      )
-      setToastMsg('Producto actualizado')
-    } else {
-      const nuevo: Producto = {
-        id: 'local-' + Date.now(),
-        proveedorId: miProveedor?.id ?? '',
-        nombre,
-        precio,
-        unidad: form.unidad as Unidad,
-        stockDisponible: stock,
-        descripcion: form.descripcion.trim() || undefined,
-        activo: form.disponible,
+    setSubmitting(true)
+    try {
+      if (productoEditar) {
+        const updated = await updateProducto(productoEditar.id, {
+          nombre,
+          precio,
+          stockDisponible: stock,
+          unidad: form.unidad as Unidad,
+          descripcion: form.descripcion.trim() || undefined,
+          activo: form.disponible,
+        })
+        setProductos((prev) => prev.map((p) => (p.id === productoEditar.id ? updated : p)))
+        setToastMsg('Producto actualizado')
+      } else {
+        const nuevo = await createProducto({
+          proveedorId: miProveedor.id,
+          nombre,
+          precio,
+          unidad: form.unidad as Unidad,
+          stockDisponible: stock,
+          descripcion: form.descripcion.trim() || undefined,
+        })
+        setProductos((prev) => [...prev, nuevo])
+        setToastMsg('Producto añadido')
       }
-      setProductos((prev) => [...prev, nuevo])
-      setToastMsg('Producto añadido')
+      setShowModal(false)
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : 'Error al guardar')
+    } finally {
+      setSubmitting(false)
     }
-    setShowModal(false)
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!confirmEliminarId) return
-    setProductos((prev) => prev.filter((p) => p.id !== confirmEliminarId))
+    try {
+      await deleteProducto(confirmEliminarId)
+      setProductos((prev) => prev.filter((p) => p.id !== confirmEliminarId))
+      setToastMsg('Producto eliminado')
+    } catch {
+      setToastMsg('Error al eliminar')
+    }
     setConfirmEliminarId(null)
-    setToastMsg('Producto eliminado')
   }
 
   if (!miProveedor) {
@@ -631,10 +650,11 @@ export default function MiCatalogoPage() {
                 </button>
                 <button
                   onClick={handleSubmit}
+                  disabled={submitting}
                   className="flex-1 py-3 text-sm font-semibold text-white"
-                  style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
+                  style={{ backgroundColor: '#F28C28', borderRadius: 12, opacity: submitting ? 0.6 : 1 }}
                 >
-                  {productoEditar ? 'Guardar cambios' : 'Añadir producto'}
+                  {submitting ? 'Guardando…' : (productoEditar ? 'Guardar cambios' : 'Añadir producto')}
                 </button>
               </div>
             </div>

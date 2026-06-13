@@ -284,8 +284,17 @@ export async function updateProducto(
   return toProducto(data as ProductoRow)
 }
 
+export async function getProductosByProveedor(proveedorId: string): Promise<Producto[]> {
+  const { data, error } = await supabase
+    .from('productos')
+    .select('*')
+    .eq('proveedor_id', proveedorId)
+  if (error) throw new Error(error.message)
+  return (data as ProductoRow[]).map(toProducto)
+}
+
 export async function deleteProducto(id: string): Promise<void> {
-  const { error } = await supabase.from('productos').update({ activo: false }).eq('id', id)
+  const { error } = await supabase.from('productos').delete().eq('id', id)
   if (error) throw new Error(error.message)
 }
 

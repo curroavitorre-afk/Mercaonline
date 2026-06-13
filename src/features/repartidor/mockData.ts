@@ -71,9 +71,9 @@ export const MOCK_ORDERS_HOY: Order[] = [
 ]
 
 export const PUESTO_INFO: Record<string, { nombre: string; pabellon: string; puesto: string }> = {
-  p1: { nombre: 'Frutas García', pabellon: 'A', puesto: '12' },
-  p2: { nombre: 'Verduras López', pabellon: 'B', puesto: '7' },
-  p3: { nombre: 'Finca El Olivo', pabellon: 'A', puesto: '3' },
+  p1: { nombre: 'Frutas Macías Vera', pabellon: 'A', puesto: '12' },
+  p2: { nombre: 'Hortalizas del Sur', pabellon: 'B', puesto: '7' },
+  p3: { nombre: 'Finca Los Arrayanes', pabellon: 'A', puesto: '3' },
 }
 
 export const ENTREGA_INFO: Record<string, { fruteria: string; direccion: string; hora: string }> = {

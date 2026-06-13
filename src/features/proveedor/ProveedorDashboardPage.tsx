@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/lib/stores/auth'
-import { MOCK_PROVEEDORES, MOCK_PRODUCTOS } from '@/lib/mock-data'
+import { getProveedorByUserId, getProductos } from '@/lib/api'
+import type { Proveedor, Producto } from '@/lib/types'
 import BottomNavProveedor from '@/components/BottomNavProveedor'
 
 function IconTag() {
@@ -42,7 +44,18 @@ export default function ProveedorDashboardPage() {
   const { user } = useAuthStore()
   const navigate = useNavigate()
 
-  const miProveedor = MOCK_PROVEEDORES.find((p) => p.userId === user?.id) ?? MOCK_PROVEEDORES[0]
+  const [miProveedor, setMiProveedor] = useState<Proveedor | null>(null)
+  const [misProductos, setMisProductos] = useState<Producto[]>([])
+
+  useEffect(() => {
+    if (!user?.id) return
+    getProveedorByUserId(user.id).then(async (prov) => {
+      if (!prov) return
+      setMiProveedor(prov)
+      const prods = await getProductos(prov.id)
+      setMisProductos(prods)
+    })
+  }, [user?.id])
 
   if (!miProveedor) {
     return (
@@ -52,7 +65,6 @@ export default function ProveedorDashboardPage() {
     )
   }
 
-  const misProductos = MOCK_PRODUCTOS.filter((p) => p.proveedorId === miProveedor.id)
   const productosActivos = misProductos.filter((p) => p.activo).length
 
   const iniciales = (user?.nombre ?? miProveedor.nombre)

@@ -223,9 +223,9 @@ function PhoneMockup() {
             </p>
 
             {[
-              { puesto: 'Frutas García', items: [{ nombre: 'Naranjas Valencia', qty: '50 kg' }, { nombre: 'Limones', qty: '20 kg' }] },
-              { puesto: 'Verduras López', items: [{ nombre: 'Tomates rama', qty: '30 kg' }] },
-              { puesto: 'Finca El Olivo', items: [{ nombre: 'Melocotones', qty: '15 kg' }] },
+              { puesto: 'Frutas Macías Vera', items: [{ nombre: 'Naranjas Valencia', qty: '50 kg' }, { nombre: 'Limones', qty: '20 kg' }] },
+              { puesto: 'Hortalizas del Sur', items: [{ nombre: 'Tomates rama', qty: '30 kg' }] },
+              { puesto: 'Finca Los Arrayanes', items: [{ nombre: 'Melocotones', qty: '15 kg' }] },
             ].map((grupo) => (
               <div key={grupo.puesto} className="bg-white rounded-xl p-2.5" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                 <div className="flex items-center gap-1.5 mb-1.5">
