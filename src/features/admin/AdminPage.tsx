@@ -8,6 +8,11 @@ import {
   getAllOrdersSemana,
   getAllProveedores,
   getFruteros,
+  getAllUsers,
+  bloquearUsuario,
+  desbloquearUsuario,
+  eliminarUsuario,
+  reiniciarDatosDemo,
 } from '@/lib/api'
 import { getFase, setFase } from '@/lib/config'
 import type { Fase } from '@/lib/config'
@@ -40,6 +45,20 @@ const DOT_COLORS: Record<OrderStatus, string> = {
   incidencia: 'bg-red-500',
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  frutero: 'Frutero',
+  proveedor: 'Proveedor',
+  repartidor: 'Repartidor',
+  admin: 'Admin',
+}
+
+const FILTRO_OPCIONES = [
+  { value: 'todos', label: 'Todos' },
+  { value: 'frutero', label: 'Frutero' },
+  { value: 'proveedor', label: 'Proveedor' },
+  { value: 'repartidor', label: 'Repartidor' },
+] as const
+
 const ORDEN_ESTADOS: OrderStatus[] = [
   'confirmado',
   'en_recogida',
@@ -63,6 +82,11 @@ export default function AdminPage() {
   const [loadingFase, setLoadingFase] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [usuarios, setUsuarios] = useState<User[]>([])
+  const [filtroRol, setFiltroRol] = useState<'todos' | 'frutero' | 'proveedor' | 'repartidor'>('todos')
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [confirmReset, setConfirmReset] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
 
   const cargar = () => {
     setLoading(true)
@@ -74,14 +98,16 @@ export default function AdminPage() {
       getAllProveedores(),
       getFruteros(),
       getFase(),
+      getAllUsers(),
     ])
-      .then(([prov, ords, ordsSemana, allProvs, fruts, faseActual]) => {
+      .then(([prov, ords, ordsSemana, allProvs, fruts, faseActual, users]) => {
         setPendientes(prov)
         setPedidos(ords)
         setPedidosSemana(ordsSemana)
         setProveedores(allProvs)
         setFruteros(fruts)
         setFaseState(faseActual)
+        setUsuarios(users)
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false))
@@ -128,6 +154,65 @@ export default function AdminPage() {
       setError(e instanceof Error ? e.message : 'Error')
     } finally {
       setActionLoading(null)
+    }
+  }
+
+  function showToast(msg: string) {
+    setToast(msg)
+    setTimeout(() => setToast(null), 3000)
+  }
+
+  async function handleBloquear(id: string) {
+    setActionLoading(id)
+    setError(null)
+    try {
+      await bloquearUsuario(id)
+      setUsuarios((prev) => prev.map((u) => u.id === id ? { ...u, bloqueado: true } : u))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  async function handleDesbloquear(id: string) {
+    setActionLoading(id)
+    setError(null)
+    try {
+      await desbloquearUsuario(id)
+      setUsuarios((prev) => prev.map((u) => u.id === id ? { ...u, bloqueado: false } : u))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  async function handleEliminar(id: string) {
+    setActionLoading(id)
+    setConfirmDeleteId(null)
+    setError(null)
+    try {
+      await eliminarUsuario(id)
+      setUsuarios((prev) => prev.filter((u) => u.id !== id))
+      showToast('Usuario eliminado')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al eliminar usuario')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  async function handleReiniciarDemo() {
+    setConfirmReset(false)
+    setError(null)
+    try {
+      await reiniciarDatosDemo()
+      setPedidos([])
+      setPedidosSemana([])
+      showToast('Datos reiniciados correctamente')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al reiniciar datos')
     }
   }
 
@@ -336,10 +421,10 @@ export default function AdminPage() {
             </div>
           </section>
 
-          {/* ── Proveedores pendientes ────────────────────────────────────── */}
+          {/* ── Puestos pendientes de aprobación ─────────────────────────── */}
           <section>
             <h2 className="text-base font-semibold text-bosque font-serif mb-3 flex items-center gap-2">
-              Proveedores pendientes
+              Puestos pendientes de aprobación
               {pendientes.length > 0 && (
                 <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
                   {pendientes.length}
@@ -348,7 +433,7 @@ export default function AdminPage() {
             </h2>
 
             {pendientes.length === 0 ? (
-              <p className="text-sm text-gray-400">Ningún proveedor pendiente.</p>
+              <p className="text-sm text-gray-400">No hay solicitudes pendientes</p>
             ) : (
               <div className="space-y-3">
                 {pendientes.map((prov) => (
@@ -360,18 +445,24 @@ export default function AdminPage() {
                     {prov.descripcion && (
                       <p className="text-sm text-gray-400 mt-0.5">{prov.descripcion}</p>
                     )}
+                    {prov.createdAt && (
+                      <p className="text-xs text-gray-300 mt-1">
+                        Registro: {new Date(prov.createdAt).toLocaleDateString('es-ES')}
+                      </p>
+                    )}
                     <div className="flex gap-2 mt-3">
                       <button
                         onClick={() => handleAprobar(prov.id)}
                         disabled={actionLoading === prov.id}
-                        className="flex-1 bg-bosque hover:bg-bosque-dark disabled:opacity-50 text-white text-sm font-medium py-2 rounded-xl transition-colors"
+                        className="flex-1 disabled:opacity-50 text-white text-sm font-medium py-2 rounded-xl transition-opacity"
+                        style={{ backgroundColor: '#6F9E7B' }}
                       >
                         Aprobar
                       </button>
                       <button
                         onClick={() => handleRechazar(prov.id)}
                         disabled={actionLoading === prov.id}
-                        className="flex-1 bg-red-50 hover:bg-red-100 disabled:opacity-50 text-red-600 text-sm font-medium py-2 rounded-xl transition-colors"
+                        className="flex-1 disabled:opacity-50 text-red-600 text-sm font-medium py-2 rounded-xl border border-red-400 bg-transparent hover:bg-red-50 transition-colors"
                       >
                         Rechazar
                       </button>
@@ -380,6 +471,105 @@ export default function AdminPage() {
                 ))}
               </div>
             )}
+          </section>
+
+          {/* ── Gestión de usuarios ──────────────────────────────────────────── */}
+          <section>
+            <h2 className="text-base font-semibold font-serif mb-3" style={{ color: '#1B3A2A' }}>
+              Usuarios
+            </h2>
+
+            <div className="flex gap-2 overflow-x-auto pb-1 mb-3">
+              {FILTRO_OPCIONES.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setFiltroRol(opt.value)}
+                  className="shrink-0 text-xs font-medium px-3 py-1.5 rounded-full border transition-colors"
+                  style={
+                    filtroRol === opt.value
+                      ? { backgroundColor: '#1B3A2A', color: '#fff', borderColor: '#1B3A2A' }
+                      : { backgroundColor: '#F8F7F3', color: '#1B3A2A', borderColor: '#D1D5DB' }
+                  }
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+              {(() => {
+                const filtrados = filtroRol === 'todos'
+                  ? usuarios
+                  : usuarios.filter((u) => u.role === filtroRol)
+                if (filtrados.length === 0) {
+                  return <p className="text-sm text-gray-400 px-4 py-3">Sin usuarios en esta categoría.</p>
+                }
+                return (
+                  <div className="divide-y divide-gray-100">
+                    {filtrados.map((u) => (
+                      <div key={u.id} className="px-4 py-3">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">{u.nombre}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {u.telefono} · {ROLE_LABELS[u.role]}
+                            </p>
+                          </div>
+                          <span
+                            className="shrink-0 text-xs font-medium px-2 py-0.5 rounded-full"
+                            style={
+                              u.bloqueado
+                                ? { backgroundColor: '#FEE2E2', color: '#DC2626' }
+                                : { backgroundColor: '#DCFCE7', color: '#16A34A' }
+                            }
+                          >
+                            {u.bloqueado ? 'Bloqueado' : 'Activo'}
+                          </span>
+                        </div>
+
+                        {u.role !== 'admin' && (
+                          confirmDeleteId === u.id ? (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleEliminar(u.id)}
+                                disabled={actionLoading === u.id}
+                                className="flex-1 text-xs font-medium py-1.5 rounded-lg disabled:opacity-50 transition-colors"
+                                style={{ backgroundColor: '#DC2626', color: '#fff' }}
+                              >
+                                {actionLoading === u.id ? 'Eliminando…' : 'Confirmar eliminación'}
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteId(null)}
+                                className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-300 text-gray-600"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => u.bloqueado ? handleDesbloquear(u.id) : handleBloquear(u.id)}
+                                disabled={actionLoading === u.id}
+                                className="text-xs font-medium px-3 py-1.5 rounded-lg border disabled:opacity-50 transition-colors"
+                                style={{ borderColor: '#1B3A2A', color: '#1B3A2A', backgroundColor: '#F8F7F3' }}
+                              >
+                                {actionLoading === u.id ? '…' : u.bloqueado ? 'Desbloquear' : 'Bloquear'}
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteId(u.id)}
+                                className="text-xs font-medium px-3 py-1.5 rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition-colors"
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
+            </div>
           </section>
 
           {/* ── Estado de la ruta ────────────────────────────────────────── */}
@@ -446,7 +636,60 @@ export default function AdminPage() {
               </div>
             )}
           </section>
+
+          {/* ── Datos de demostración ────────────────────────────────────────── */}
+          <section
+            className="rounded-2xl p-4"
+            style={{ border: '1.5px solid #F28C28', backgroundColor: '#FFFBF5' }}
+          >
+            <h2 className="text-base font-semibold font-serif mb-1" style={{ color: '#1B3A2A' }}>
+              Datos de demostración
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Elimina todos los pedidos y mensajes de la base de datos. No se puede deshacer.
+            </p>
+
+            {confirmReset ? (
+              <div className="space-y-3">
+                <p className="text-sm font-medium" style={{ color: '#1B3A2A' }}>
+                  Esto eliminará TODOS los pedidos y mensajes. ¿Continuar?
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleReiniciarDemo}
+                    className="flex-1 text-white text-sm font-medium py-2 rounded-xl transition-opacity"
+                    style={{ backgroundColor: '#F28C28' }}
+                  >
+                    Sí, eliminar todo
+                  </button>
+                  <button
+                    onClick={() => setConfirmReset(false)}
+                    className="flex-1 text-sm font-medium py-2 rounded-xl border border-gray-300 text-gray-600"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmReset(true)}
+                className="w-full text-white text-sm font-medium py-2.5 rounded-xl transition-opacity hover:opacity-90"
+                style={{ backgroundColor: '#F28C28' }}
+              >
+                Reiniciar pedidos y mensajes
+              </button>
+            )}
+          </section>
         </>
+      )}
+
+      {toast && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 text-white text-sm font-medium px-5 py-3 rounded-xl shadow-lg z-50 whitespace-nowrap"
+          style={{ backgroundColor: '#1B3A2A' }}
+        >
+          {toast}
+        </div>
       )}
     </main>
   )

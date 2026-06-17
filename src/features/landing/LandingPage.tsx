@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useEffect, useRef, type ReactNode, type CSSProperties } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 // ─── Animación de entrada por scroll ─────────────────────────────────────────
 
@@ -7,9 +7,10 @@ interface FadeInProps {
   children: ReactNode
   delay?: number
   className?: string
+  translateY?: number
 }
 
-function FadeIn({ children, delay = 0, className = '' }: FadeInProps) {
+function FadeIn({ children, delay = 0, className = '', translateY = 18 }: FadeInProps) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -36,7 +37,7 @@ function FadeIn({ children, delay = 0, className = '' }: FadeInProps) {
       className={className}
       style={{
         opacity: 0,
-        transform: 'translateY(18px)',
+        transform: `translateY(${translateY}px)`,
         transition: `opacity 0.65s ease-out ${delay}ms, transform 0.65s ease-out ${delay}ms`,
       }}
     >
@@ -47,142 +48,11 @@ function FadeIn({ children, delay = 0, className = '' }: FadeInProps) {
 
 // ─── Iconos SVG ───────────────────────────────────────────────────────────────
 
-function IconClock() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="9" />
-      <polyline points="12,6 12,12 16,14" />
-    </svg>
-  )
-}
-
-function IconMoon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-    </svg>
-  )
-}
-
-function IconPackage() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-    </svg>
-  )
-}
-
-function IconKey() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
-    </svg>
-  )
-}
-
-function IconSleep() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 7l-10 10" />
-      <path d="M8 7h9v4" />
-      <path d="M7 17h9v-4" />
-    </svg>
-  )
-}
-
-function IconSun() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="4" />
-      <line x1="12" y1="2" x2="12" y2="6" />
-      <line x1="12" y1="18" x2="12" y2="22" />
-      <line x1="4.22" y1="4.22" x2="7.05" y2="7.05" />
-      <line x1="16.95" y1="16.95" x2="19.78" y2="19.78" />
-      <line x1="2" y1="12" x2="6" y2="12" />
-      <line x1="18" y1="12" x2="22" y2="12" />
-      <line x1="4.22" y1="19.78" x2="7.05" y2="16.95" />
-      <line x1="16.95" y1="7.05" x2="19.78" y2="4.22" />
-    </svg>
-  )
-}
-
-function IconHeart() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-  )
-}
-
-function IconStore() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <polyline points="9,22 9,12 15,12 15,22" />
-    </svg>
-  )
-}
-
 function IconCheck() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20,6 9,17 4,12" />
     </svg>
-  )
-}
-
-function IconLeaf() {
-  return (
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 8C8 10 5.9 16.17 3.82 20.26L5.71 21l1-2.3A4.49 4.49 0 0 0 8 19c8 0 13-8 11-16z" />
-      <path d="M3.82 20.26L8 16" />
-    </svg>
-  )
-}
-
-// ─── Línea de tiempo ──────────────────────────────────────────────────────────
-
-const TIMELINE_ITEMS = [
-  { time: '03:00', label: 'Despertador', Icon: IconClock },
-  { time: '04:00', label: 'Mercagranada', Icon: IconMoon },
-  { time: '05:30', label: 'Carga y vuelta', Icon: IconPackage },
-  { time: '07:00', label: 'Abrir tienda', Icon: IconKey },
-  { time: '15:00', label: 'Cierre', Icon: IconSleep },
-]
-
-function Timeline() {
-  return (
-    <div
-      className="overflow-x-auto -mx-6 px-6 pb-2"
-      style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' } as CSSProperties}
-    >
-      <div className="flex items-start w-max">
-        {TIMELINE_ITEMS.map((item, i) => (
-          <div key={item.time} className="flex items-start">
-            <div className="flex flex-col items-center w-[80px]">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white"
-                style={{ backgroundColor: '#F28C28' }}
-              >
-                <item.Icon />
-              </div>
-              <p
-                className="text-[11px] font-bold mt-2 tabular-nums"
-                style={{ color: '#F28C28' }}
-              >
-                {item.time}
-              </p>
-              <p className="text-[10px] mt-0.5 text-center leading-tight px-1" style={{ color: '#9CA3AF' }}>
-                {item.label}
-              </p>
-            </div>
-            {i < TIMELINE_ITEMS.length - 1 && (
-              <div className="h-px mt-5 shrink-0 w-6" style={{ backgroundColor: '#6F9E7B' }} />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
   )
 }
 
@@ -265,161 +135,238 @@ function PhoneMockup() {
   )
 }
 
+// ─── Logo de marca ────────────────────────────────────────────────────────────
+
+function Logo() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1, gap: 2 }}>
+      <span
+        style={{
+          fontFamily: 'Fraunces, serif',
+          fontWeight: 900,
+          fontSize: 18,
+          color: 'white',
+          letterSpacing: '-0.01em',
+        }}
+      >
+        MERCA
+      </span>
+      <span
+        style={{
+          fontFamily: 'Inter, sans-serif',
+          fontWeight: 600,
+          fontSize: 9,
+          color: '#6F9E7B',
+          letterSpacing: '0.22em',
+          textTransform: 'uppercase' as const,
+        }}
+      >
+        ONLINE
+      </span>
+    </div>
+  )
+}
+
+// ─── Camión animado ───────────────────────────────────────────────────────────
+
+function TruckSVG() {
+  return (
+    <svg width="220" height="80" viewBox="0 0 220 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="80" y="20" width="118" height="44" rx="4" fill="#2D5A41" />
+      <rect x="14" y="16" width="70" height="48" rx="6" fill="#3D7055" />
+      <rect x="28" y="24" width="36" height="22" rx="4" fill="#A7D4BC" opacity="0.55" />
+      <rect x="9" y="40" width="8" height="5" rx="2" fill="#F28C28" />
+      <rect x="9" y="46" width="10" height="3" rx="1" fill="#4A8A62" />
+      <line x1="80" y1="20" x2="80" y2="64" stroke="#1B3A2A" strokeWidth="1.5" />
+      <circle cx="40" cy="70" r="13" fill="#0D1F17" />
+      <circle cx="40" cy="70" r="6" fill="#2D5A41" />
+      <circle cx="170" cy="70" r="13" fill="#0D1F17" />
+      <circle cx="170" cy="70" r="6" fill="#2D5A41" />
+    </svg>
+  )
+}
+
 // ─── Página ───────────────────────────────────────────────────────────────────
+
+const HERO_WORDS = ['¿Cansado', 'de', 'levantarte', 'cada', 'día', 'a', 'las', '04:00?']
+const HERO_ORANGE = new Set(['cada', 'día', 'a', 'las', '04:00?'])
 
 export default function LandingPage() {
   const navigate = useNavigate()
 
   return (
     <div className="flex flex-col">
-      {/* ── HEADER ────────────────────────────────────────────────────────── */}
-      <header
-        className="sticky top-0 z-50 flex items-center justify-between px-5 py-4 backdrop-blur-md"
-        style={{ backgroundColor: 'rgba(27,58,42,0.92)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
-      >
-        <span className="font-bold text-white text-base tracking-tight font-serif">MercaOnline</span>
-        <Link
-          to="/login"
-          className="text-sm font-medium transition-colors"
-          style={{ color: 'rgba(255,255,255,0.7)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
-        >
-          Entrar →
-        </Link>
-      </header>
+      {/* ── Keyframes ─────────────────────────────────────────────────────── */}
+      <style>{`
+        @keyframes wordAppear {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes truckDrive {
+          from { transform: translateX(110vw); }
+          to   { transform: translateX(-110vw); }
+        }
+      `}</style>
 
-      {/* ── S1: HERO ──────────────────────────────────────────────────────── */}
+      {/* ── S1: HERO (100vh, navbar integrado) ───────────────────────────── */}
       <section
-        className="min-h-screen flex flex-col justify-center px-6 py-20 text-white relative overflow-hidden"
+        className="relative flex flex-col"
         style={{
+          height: '100vh',
           backgroundImage: 'url(https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=1600)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        {/* Overlay */}
         <div className="absolute inset-0" style={{ backgroundColor: 'rgba(27,58,42,0.85)' }} />
 
-        <div className="max-w-xl mx-auto w-full relative z-10">
-          <FadeIn>
-            <p className="text-xs uppercase tracking-widest mb-6" style={{ color: '#6F9E7B', fontFamily: 'var(--font-sans)', letterSpacing: '0.15em' }}>
-              Para fruteros de barrio
-            </p>
-          </FadeIn>
+        {/* Navbar */}
+        <nav className="relative z-10 flex items-center justify-between px-6 py-5">
+          <Logo />
+          <Link
+            to="/login"
+            className="text-sm font-medium"
+            style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'Inter, sans-serif' }}
+          >
+            Entrar →
+          </Link>
+        </nav>
 
-          <FadeIn delay={80}>
-            <div className="mb-6">
+        {/* Contenido hero */}
+        <div className="relative z-10 flex flex-col justify-center flex-1 px-6 pb-16 max-w-2xl mx-auto w-full">
+          <h1
+            className="mb-6 leading-none"
+            style={{
+              fontFamily: 'Clash Display, sans-serif',
+              fontWeight: 700,
+              fontSize: 'clamp(3rem, 11vw, 7.5rem)',
+            }}
+          >
+            {HERO_WORDS.map((word, i) => (
               <span
-                className="font-black text-white leading-none tabular-nums block font-serif"
-                style={{ fontSize: 'clamp(5rem, 28vw, 7.5rem)', fontWeight: 900 }}
+                key={i}
+                className="inline-block"
+                style={{
+                  color: HERO_ORANGE.has(word) ? '#F28C28' : 'white',
+                  marginRight: '0.25em',
+                  animation: 'wordAppear 0.65s ease-out both',
+                  animationDelay: `${i * 0.09}s`,
+                }}
               >
-                04:00
+                {word}
               </span>
-              <span className="block text-lg mt-1 font-light" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                de la mañana.
-              </span>
-            </div>
-          </FadeIn>
+            ))}
+          </h1>
 
-          <FadeIn delay={180}>
-            <h1 className="text-2xl sm:text-3xl font-bold leading-snug text-white mb-4 font-serif">
-              Llevas 12 horas trabajando.
-              <br />
-              <span style={{ color: 'rgba(255,255,255,0.5)' }}>Y aún no has comido.</span>
-            </h1>
-          </FadeIn>
+          <p
+            className="text-base mb-10"
+            style={{
+              color: 'rgba(255,255,255,0.55)',
+              fontFamily: 'Inter, sans-serif',
+              animation: 'wordAppear 0.65s ease-out both',
+              animationDelay: '0.85s',
+            }}
+          >
+            MercaOnline lo resuelve.
+          </p>
 
-          <FadeIn delay={270}>
-            <p className="text-base leading-relaxed mb-10 max-w-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>
-              Los fruteros de barrio se levantan antes del amanecer cada día para ir a Mercagranada.
-              MercaOnline lo cambia.
-            </p>
-          </FadeIn>
-
-          <FadeIn delay={360}>
+          <div
+            style={{
+              animation: 'wordAppear 0.65s ease-out both',
+              animationDelay: '1s',
+            }}
+          >
             <button
               onClick={() => navigate('/registro', { state: { role: 'frutero' } })}
-              className="inline-flex items-center gap-2 text-white font-semibold px-7 py-4 transition-colors text-base"
-              style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
+              className="inline-flex items-center gap-2 text-white font-semibold px-7 py-4 text-base transition-colors"
+              style={{ backgroundColor: '#F28C28', borderRadius: 12, fontFamily: 'Inter, sans-serif' }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#D97A1E')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#F28C28')}
             >
-              Quiero dormir más
-              <span aria-hidden>→</span>
+              Quiero dormir más →
             </button>
-          </FadeIn>
+          </div>
         </div>
       </section>
 
       {/* ── S2: EL DOLOR ──────────────────────────────────────────────────── */}
-      <section className="text-white px-6 py-20" style={{ backgroundColor: '#1B3A2A' }}>
-        <div className="max-w-xl mx-auto space-y-10">
+      <section className="text-white px-6 py-20 overflow-hidden" style={{ backgroundColor: '#1B3A2A' }}>
+        <div className="max-w-xl mx-auto space-y-12">
+
           <FadeIn>
-            <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#6F9E7B', letterSpacing: '0.15em' }}>
-              Cada día. Todos los días.
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-bold leading-snug font-serif">
-              Tu jornada empieza
-              <br />
-              cuando la ciudad duerme.
+            <h2
+              className="text-3xl sm:text-4xl leading-tight"
+              style={{ fontFamily: 'Fraunces, serif', fontWeight: 700, color: 'white' }}
+            >
+              Tu jornada empieza cuando la ciudad duerme.
             </h2>
           </FadeIn>
 
           <FadeIn delay={80}>
-            <div className="space-y-4 text-base leading-relaxed">
-              <p style={{ color: 'rgba(255,255,255,0.8)' }}>
-                El despertador a las 3. El frío del coche, la lonja medio a oscuras.
-                Puesto 3 para las naranjas, puesto 11 para las peras,
-                al fondo para los plátanos si quedan.
+            <div className="space-y-5 text-base leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <p style={{ color: 'rgba(255,255,255,0.85)' }}>
+                El despertador a las 3:30. El frío del coche en mitad de la noche. La lonja a oscuras, el olor a fruta mojada, las carretillas chocando contra el suelo.
               </p>
-              <p style={{ color: 'rgba(255,255,255,0.55)' }}>
-                Carretilla. Furgoneta. El atasco de vuelta.
-                Y a las 8 ya tienes que estar colocando el género antes de abrir.
+              <p style={{ color: 'rgba(255,255,255,0.6)' }}>
+                Puesto 3 para las naranjas. Puesto 11 para las peras. Al fondo de todo, si quedan, los plátanos. Cuatro viajes con la carretilla. Negociar el precio a las 4 de la mañana con los ojos medio cerrados.
               </p>
               <p style={{ color: 'rgba(255,255,255,0.35)' }}>
-                Diez horas de pie atendiendo. Cerrar, cuadrar, repasar el pedido de mañana.
-                Y a empezar otra vez.
+                De vuelta a las 6. Furgoneta cargada, cuerpo cargado. A las 8 colocando el género antes de abrir. Diez horas de pie. Cerrar, cuadrar, repasar el pedido de mañana. Y vuelta a empezar.
               </p>
             </div>
           </FadeIn>
 
-          <FadeIn delay={120}>
-            <div>
-              <p className="text-xs uppercase tracking-widest font-semibold mb-5" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.15em' }}>
-                Tu día, en números
-              </p>
-              <Timeline />
+          {/* Animación camión */}
+          <FadeIn delay={130}>
+            <div className="relative" style={{ height: 96, overflow: 'hidden' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 14,
+                  animation: 'truckDrive 4s linear infinite',
+                }}
+              >
+                <TruckSVG />
+              </div>
+              <div
+                className="absolute bottom-4 left-0 right-0"
+                style={{ height: 2, backgroundColor: 'rgba(111,158,123,0.25)' }}
+              />
             </div>
           </FadeIn>
 
-          <FadeIn delay={160}>
-            <div className="pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-              <p className="text-xl font-bold text-white leading-snug font-serif">
+          <FadeIn delay={170}>
+            <div className="pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <p
+                className="text-2xl sm:text-3xl leading-tight"
+                style={{ fontFamily: 'Fraunces, serif', fontWeight: 700, color: 'white' }}
+              >
                 Llevas años haciéndolo así.
                 <br />
                 <span style={{ color: 'rgba(255,255,255,0.35)' }}>No tiene que seguir siendo así.</span>
               </p>
             </div>
           </FadeIn>
+
         </div>
       </section>
 
       {/* ── S3: EL GIRO ───────────────────────────────────────────────────── */}
-      <section className="text-white px-6 py-20" style={{ backgroundColor: '#152D20' }}>
+      <section className="px-6 py-20" style={{ backgroundColor: '#F8F7F3' }}>
         <div className="max-w-xl mx-auto">
           <FadeIn>
-            <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#6F9E7B', letterSpacing: '0.15em' }}>
-              La idea es sencilla
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-bold leading-snug mb-4 font-serif">
-              ¿Y si tu pedido
-              <br />
-              <span style={{ color: '#6F9E7B' }}>llegara solo?</span>
+            <h2
+              className="text-3xl sm:text-4xl leading-tight mb-4"
+              style={{ fontFamily: 'Clash Display, sans-serif', fontWeight: 700, color: '#1B3A2A' }}
+            >
+              ¿Y si tu pedido{' '}
+              <span style={{ color: '#F28C28' }}>llegara solo?</span>
             </h2>
-            <p className="text-base leading-relaxed mb-12" style={{ color: 'rgba(255,255,255,0.65)' }}>
-              La noche anterior, desde el sofá, eliges lo que necesitas de cada puesto
-              en un único carrito. Nosotros lo recogemos. Tú abres la tienda con todo listo.
+            <p
+              className="text-base leading-relaxed mb-12"
+              style={{ color: '#4B5563', fontFamily: 'Inter, sans-serif' }}
+            >
+              La noche anterior, desde el sofá, haces tu pedido de todos los puestos en un único carrito. Sin madrugar, sin carretillas, sin furgoneta.
             </p>
           </FadeIn>
 
@@ -430,58 +377,60 @@ export default function LandingPage() {
       </section>
 
       {/* ── S4: CÓMO FUNCIONA ─────────────────────────────────────────────── */}
-      <section className="px-6 py-20" style={{ backgroundColor: '#F8F7F3' }}>
+      <section className="px-6 py-20" style={{ backgroundColor: '#FFFFFF' }}>
         <div className="max-w-xl mx-auto">
           <FadeIn>
-            <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#6B7280', letterSpacing: '0.15em' }}>
-              Tres pasos
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-14 font-serif" style={{ color: '#222222' }}>
+            <h2
+              className="text-3xl sm:text-4xl leading-tight mb-16"
+              style={{ fontFamily: 'Fraunces, serif', fontWeight: 700, color: '#222222' }}
+            >
               Simple por diseño.
             </h2>
           </FadeIn>
 
           <div className="relative">
-            <div className="absolute left-5 top-10 bottom-10 w-px" style={{ backgroundColor: '#E5E7EB' }} />
+            <div
+              className="absolute top-10 bottom-10"
+              style={{ left: 20, width: 2, backgroundColor: '#6F9E7B', opacity: 0.35 }}
+            />
 
-            <div className="space-y-10">
-              {[
+            <div className="space-y-12">
+              {([
                 {
                   num: '1',
-                  sub: 'La noche anterior',
-                  title: 'Haz tu pedido en 5 minutos',
-                  desc: 'Elige productos de todos los puestos en un único carrito. Sin llamadas. Sin notas de papel. Sin madrugar.',
-                  accent: false,
+                  title: 'Noche anterior',
+                  desc: 'Abre la app. Elige lo que necesitas de cada puesto. Un solo carrito.',
                 },
                 {
                   num: '2',
-                  sub: 'A las 4AM',
-                  title: 'Nuestro repartidor recoge en Mercagranada',
-                  desc: 'Mientras tú duermes, nuestro equipo pasa por cada puesto y recoge exactamente lo que pediste.',
-                  accent: false,
+                  title: 'Antes del amanecer',
+                  desc: 'Tu pedido se prepara en cada puesto exactamente como lo pediste.',
                 },
                 {
                   num: '3',
-                  sub: 'A las 7AM',
-                  title: 'Tu género en la puerta antes de abrir',
-                  desc: 'Llegas a tu tienda, lo encuentras todo. Fresco. Solo queda colocarlo y levantar la persiana.',
-                  accent: true,
+                  title: 'Al abrir tu tienda',
+                  desc: 'Todo listo. Sin haber madrugado.',
                 },
-              ].map((step, i) => (
-                <FadeIn key={step.num} delay={i * 100}>
-                  <div className="flex gap-5">
+              ] as const).map((step, i) => (
+                <FadeIn key={step.num} delay={i * 150} translateY={30}>
+                  <div className="flex gap-6">
                     <div
                       className="shrink-0 w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-sm z-10"
-                      style={{ backgroundColor: step.accent ? '#F28C28' : '#1B3A2A' }}
+                      style={{ backgroundColor: '#F28C28' }}
                     >
                       {step.num}
                     </div>
-                    <div className="pt-1">
-                      <p className="text-xs font-mono mb-1" style={{ color: '#6B7280' }}>{step.sub}</p>
-                      <h3 className="font-bold text-lg mb-1.5 font-serif" style={{ color: '#222222' }}>
+                    <div className="pt-1.5">
+                      <h3
+                        className="text-xl mb-2"
+                        style={{ fontFamily: 'Fraunces, serif', fontWeight: 700, color: '#222222' }}
+                      >
                         {step.title}
                       </h3>
-                      <p className="text-sm leading-relaxed" style={{ color: '#6B7280' }}>
+                      <p
+                        className="text-base leading-relaxed"
+                        style={{ color: '#6B7280', fontFamily: 'Inter, sans-serif' }}
+                      >
                         {step.desc}
                       </p>
                     </div>
@@ -494,97 +443,72 @@ export default function LandingPage() {
       </section>
 
       {/* ── S5: EL RESULTADO ──────────────────────────────────────────────── */}
-      <section className="px-6 py-20" style={{ backgroundColor: '#F8F7F3' }}>
-        <div className="max-w-xl mx-auto">
+      <section className="px-6 py-24" style={{ backgroundColor: '#F8F7F3' }}>
+        <div className="max-w-2xl mx-auto">
           <FadeIn>
-            <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#F28C28', letterSpacing: '0.15em' }}>
-              A partir de ahora
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3 font-serif" style={{ color: '#222222' }}>
-              Tu mañana, por fin.
+            <h2
+              className="leading-none mb-8"
+              style={{
+                fontFamily: 'Clash Display, sans-serif',
+                fontWeight: 700,
+                fontSize: 'clamp(80px, 15vw, 140px)',
+                lineHeight: 0.92,
+              }}
+            >
+              <span style={{ color: '#1B3A2A', display: 'block' }}>Descansa</span>
+              <span style={{ color: '#F28C28', display: 'block' }}>con MercaOnline.</span>
             </h2>
-            <p className="text-base leading-relaxed mb-10" style={{ color: '#6B7280' }}>
-              Desayuna tranquilo. Lleva a los niños al cole.
-              Llega descansado a tu tienda. Tu género ya está ahí.
+            <p
+              className="text-lg sm:text-xl leading-relaxed"
+              style={{ color: '#6B7280', fontFamily: 'Inter, sans-serif', maxWidth: 380 }}
+            >
+              Sin alarma a las 3.
+              <br />
+              Sin frío. Sin prisas.
+              <br />
+              Tu género ya está.
             </p>
-          </FadeIn>
-
-          <div className="space-y-4">
-            {[
-              { Icon: IconSun, title: 'Te despiertas a las 7', desc: 'Sin alarma a las 3. Sin prisa. El primer café como debe ser.' },
-              { Icon: IconHeart, title: 'Tiempo para lo que importa', desc: 'Los niños al cole, un rato de tranquilidad. Cosas que antes no existían.' },
-              { Icon: IconStore, title: 'Abres. El género ya está.', desc: 'Todo lo que pediste anoche, en la puerta. Fresco. Completo.' },
-            ].map((item, i) => (
-              <FadeIn key={item.title} delay={i * 80}>
-                <div
-                  className="flex items-start gap-4 bg-white p-5"
-                  style={{ borderRadius: 16, border: '1px solid #E5E7EB', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
-                >
-                  <div
-                    className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: '#FEF0DC', color: '#F28C28' }}
-                  >
-                    <item.Icon />
-                  </div>
-                  <div>
-                    <p className="font-semibold" style={{ color: '#222222' }}>{item.title}</p>
-                    <p className="text-sm mt-0.5 leading-snug" style={{ color: '#6B7280' }}>{item.desc}</p>
-                  </div>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-
-          <FadeIn delay={260}>
-            <div className="mt-10">
-              <button
-                onClick={() => navigate('/registro', { state: { role: 'frutero' } })}
-                className="w-full text-white font-semibold px-7 py-4 transition-colors text-base"
-                style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#D97A1E')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#F28C28')}
-              >
-                Quiero dormir más →
-              </button>
-            </div>
           </FadeIn>
         </div>
       </section>
-
-      {/* ── SEPARADOR ─────────────────────────────────────────────────────── */}
-      <div className="h-px" style={{ backgroundColor: 'rgba(27,58,42,0.15)' }} />
 
       {/* ── S6: PARA PUESTOS ──────────────────────────────────────────────── */}
       <section className="text-white px-6 py-16" style={{ backgroundColor: '#1B3A2A' }}>
         <div className="max-w-xl mx-auto">
           <FadeIn>
-            <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#6F9E7B', letterSpacing: '0.15em' }}>
-              Para los puestos de la lonja
-            </p>
-            <h2 className="text-2xl font-bold leading-snug mb-4 font-serif">
-              ¿Tienes un puesto
-              <br />
-              en Mercagranada?
+            <h2
+              className="text-2xl sm:text-3xl leading-snug mb-4"
+              style={{ fontFamily: 'Fraunces, serif', fontWeight: 700, color: 'white' }}
+            >
+              ¿Tienes un puesto en Mercagranada?
             </h2>
-            <p className="text-base leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.7)' }}>
-              Sube tu stock del día siguiente y vende lo que ya sabes que tienes.
-              Menos merma. Más previsibilidad.
-              Pedidos confirmados antes de que llegue el género.
+            <p
+              className="text-base leading-relaxed mb-8"
+              style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Inter, sans-serif' }}
+            >
+              Sube tu stock del día siguiente.
+              Menos merma. Pedidos confirmados
+              antes de que llegue el género.
             </p>
           </FadeIn>
 
           <FadeIn delay={80}>
-            <div className="space-y-3 mb-8">
+            <div className="space-y-4 mb-8">
               {[
-                'Gestiona tu catálogo desde el móvil. Precios y stock en tiempo real.',
-                'Pedidos confirmados la noche anterior. Sabes exactamente qué preparar.',
-                'Menos merma. Menos sorpresas. Más rentabilidad.',
+                'Gestiona tu catálogo desde el móvil',
+                'Pedidos confirmados la noche anterior',
+                'Menos merma. Más previsibilidad.',
               ].map((texto) => (
                 <div key={texto} className="flex items-start gap-3">
                   <span className="shrink-0 mt-0.5" style={{ color: '#6F9E7B' }}>
                     <IconCheck />
                   </span>
-                  <p className="text-sm leading-snug" style={{ color: 'rgba(255,255,255,0.8)' }}>{texto}</p>
+                  <p
+                    className="text-sm leading-snug"
+                    style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'Inter, sans-serif' }}
+                  >
+                    {texto}
+                  </p>
                 </div>
               ))}
             </div>
@@ -593,10 +517,16 @@ export default function LandingPage() {
           <FadeIn delay={140}>
             <button
               onClick={() => navigate('/registro', { state: { role: 'proveedor' } })}
-              className="w-full text-white font-semibold px-7 py-4 transition-colors text-base"
-              style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#D97A1E')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#F28C28')}
+              className="font-semibold px-7 py-4 transition-colors text-base"
+              style={{
+                border: '1.5px solid white',
+                color: 'white',
+                backgroundColor: 'transparent',
+                borderRadius: 12,
+                fontFamily: 'Inter, sans-serif',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               Registra tu puesto →
             </button>
@@ -605,67 +535,74 @@ export default function LandingPage() {
       </section>
 
       {/* ── S7: CTA FINAL ─────────────────────────────────────────────────── */}
-      <section className="text-white px-6 py-20" style={{ backgroundColor: '#1B3A2A' }}>
+      <section
+        className="text-white px-6 py-24"
+        style={{ background: 'linear-gradient(to bottom, #1B3A2A, #0A1510)' }}
+      >
         <div className="max-w-xl mx-auto text-center">
           <FadeIn>
-            <div className="flex justify-center mb-5" style={{ color: '#6F9E7B' }}>
-              <IconLeaf />
-            </div>
-            <h2 className="text-3xl font-bold mb-2 font-serif">
-              El primer envío es gratis.
+            <h2
+              className="leading-tight mb-4"
+              style={{
+                fontFamily: 'Clash Display, sans-serif',
+                fontWeight: 700,
+                fontSize: 'clamp(2.5rem, 9vw, 4.5rem)',
+                color: 'white',
+              }}
+            >
+              Empieza esta noche.
             </h2>
-            <p className="text-lg mb-1" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              Sin permanencia. Sin complicaciones.
-            </p>
-            <p className="text-sm mb-10" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              Cancela cuando quieras.
+            <p
+              className="text-base mb-10"
+              style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'Inter, sans-serif' }}
+            >
+              Tu primer pedido, sin complicaciones.
             </p>
           </FadeIn>
 
           <FadeIn delay={100}>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
-                onClick={() => navigate('/registro', { state: { role: 'frutero' } })}
+                onClick={() => navigate('/registro?rol=frutero')}
                 className="text-white font-semibold px-7 py-4 transition-colors text-base"
-                style={{ backgroundColor: '#F28C28', borderRadius: 12 }}
+                style={{ backgroundColor: '#F28C28', borderRadius: 12, fontFamily: 'Inter, sans-serif' }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#D97A1E')}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#F28C28')}
               >
-                Soy frutero — empezar gratis
+                Soy frutero
               </button>
               <button
-                onClick={() => navigate('/registro', { state: { role: 'proveedor' } })}
+                onClick={() => navigate('/registro?rol=proveedor')}
                 className="font-semibold px-7 py-4 transition-colors text-base"
                 style={{
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  color: 'rgba(255,255,255,0.7)',
+                  border: '1.5px solid white',
+                  color: 'white',
                   backgroundColor: 'transparent',
                   borderRadius: 12,
+                  fontFamily: 'Inter, sans-serif',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'
-                  e.currentTarget.style.color = '#fff'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'
-                  e.currentTarget.style.color = 'rgba(255,255,255,0.7)'
-                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
-                Tengo un puesto en la lonja
+                Tengo un puesto
               </button>
             </div>
           </FadeIn>
-
-          <FadeIn delay={160}>
-            <p className="mt-8 text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
-              ¿Ya tienes cuenta?{' '}
-              <Link to="/login" className="underline transition-colors" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                Entra aquí
-              </Link>
-            </p>
-          </FadeIn>
         </div>
       </section>
+
+      {/* ── FOOTER ────────────────────────────────────────────────────────── */}
+      <footer className="py-8 text-center" style={{ backgroundColor: '#0A1510' }}>
+        <div className="flex justify-center mb-3">
+          <Logo />
+        </div>
+        <p
+          className="text-xs"
+          style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'Inter, sans-serif' }}
+        >
+          © 2025 MercaOnline · Granada
+        </p>
+      </footer>
     </div>
   )
 }

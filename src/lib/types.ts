@@ -10,6 +10,7 @@ export interface User {
   nombre: string
   role: Role
   createdAt: string // ISO 8601
+  bloqueado?: boolean
 }
 
 // ─── Proveedor (puesto en la lonja) ───────────────────────────────────────────
@@ -25,6 +26,7 @@ export interface Proveedor {
   activo: boolean
   estadoAprobacion: EstadoAprobacion
   aprobadoPor?: string // FK → User (role: admin)
+  createdAt?: string // ISO 8601
 }
 
 // ─── Unidades de medida ───────────────────────────────────────────────────────

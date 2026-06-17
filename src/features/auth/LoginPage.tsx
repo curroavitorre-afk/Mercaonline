@@ -71,6 +71,8 @@ export default function LoginPage() {
       const msg = (err as Error).message
       if (msg === 'Teléfono no registrado') {
         setError('Este número no tiene cuenta. ¿Quieres registrarte?')
+      } else if (msg.startsWith('Tu cuenta ha sido bloqueada')) {
+        setError(msg)
       } else {
         setError('No se pudo enviar el código. Comprueba el número e inténtalo de nuevo.')
       }
@@ -108,6 +110,8 @@ export default function LoginPage() {
       const msg = (err as Error).message
       if (msg === 'Teléfono no registrado') {
         setError('Este número no tiene cuenta. ¿Quieres registrarte?')
+      } else if (msg.startsWith('Tu cuenta ha sido bloqueada')) {
+        setError(msg)
       } else {
         setError('Código incorrecto, inténtalo de nuevo.')
       }

@@ -9,6 +9,7 @@ interface ProfileRow {
   nombre: string
   role: string
   created_at: string
+  bloqueado: boolean
 }
 
 interface ProveedorRow {
@@ -20,6 +21,7 @@ interface ProveedorRow {
   activo: boolean
   estado_aprobacion: string
   aprobado_por: string | null
+  created_at?: string
 }
 
 interface ProductoRow {
@@ -94,6 +96,7 @@ const toUser = (r: ProfileRow): User => ({
   nombre: r.nombre,
   role: r.role as Role,
   createdAt: r.created_at,
+  bloqueado: r.bloqueado,
 })
 
 const toProveedor = (r: ProveedorRow): Proveedor => ({
@@ -105,6 +108,7 @@ const toProveedor = (r: ProveedorRow): Proveedor => ({
   activo: r.activo,
   estadoAprobacion: r.estado_aprobacion as EstadoAprobacion,
   aprobadoPor: r.aprobado_por ?? undefined,
+  createdAt: r.created_at ?? undefined,
 })
 
 const toProducto = (r: ProductoRow): Producto => ({
@@ -194,7 +198,9 @@ export async function loginUser(telefono: string): Promise<User> {
     .single()
 
   if (error || !data) throw new Error('Teléfono no registrado')
-  return toUser(data as ProfileRow)
+  const user = toUser(data as ProfileRow)
+  if (user.bloqueado) throw new Error('Tu cuenta ha sido bloqueada, contacta con soporte')
+  return user
 }
 
 // ─── Proveedores ──────────────────────────────────────────────────────────────
@@ -568,6 +574,62 @@ export async function getConversacionesDeProveedor(proveedorId: string): Promise
       const tb = b.ultimoMensaje?.createdAt ?? b.createdAt
       return new Date(tb).getTime() - new Date(ta).getTime()
     })
+}
+
+export async function getAllUsers(): Promise<User[]> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('role')
+    .order('nombre')
+  if (error) throw new Error(error.message)
+  return (data as ProfileRow[]).map(toUser)
+}
+
+export async function bloquearUsuario(id: string): Promise<void> {
+  const { error } = await supabase.from('profiles').update({ bloqueado: true }).eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function desbloquearUsuario(id: string): Promise<void> {
+  const { error } = await supabase.from('profiles').update({ bloqueado: false }).eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function eliminarUsuario(userId: string): Promise<void> {
+  // Obtener proveedor del usuario si existe
+  const { data: prov } = await supabase
+    .from('proveedores')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  // Eliminar conversaciones donde es frutero (mensajes cascadan)
+  await supabase.from('conversaciones').delete().eq('frutero_id', userId)
+
+  // Eliminar conversaciones donde es proveedor (mensajes cascadan)
+  if (prov?.id) {
+    await supabase.from('conversaciones').delete().eq('proveedor_id', prov.id as string)
+  }
+
+  // Eliminar pedidos como frutero (order_lines cascadan)
+  await supabase.from('orders').delete().eq('frutero_id', userId)
+
+  // Eliminar perfil (proveedores cascadan → productos)
+  const { error } = await supabase.from('profiles').delete().eq('id', userId)
+  if (error) throw new Error(error.message)
+}
+
+export async function reiniciarDatosDemo(): Promise<void> {
+  // Orden: hijos antes que padres para satisfacer FK
+  const { error: e1 } = await supabase.from('order_lines').delete().not('id', 'is', null)
+  if (e1) throw new Error(e1.message)
+  const { error: e2 } = await supabase.from('orders').delete().not('id', 'is', null)
+  if (e2) throw new Error(e2.message)
+  const { error: e3 } = await supabase.from('mensajes').delete().not('id', 'is', null)
+  if (e3) throw new Error(e3.message)
+  const { error: e4 } = await supabase.from('conversaciones').delete().not('id', 'is', null)
+  if (e4) throw new Error(e4.message)
 }
 
 // ─── Repartidor ───────────────────────────────────────────────────────────────
